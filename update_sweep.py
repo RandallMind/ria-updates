@@ -19,22 +19,27 @@ SOURCES = [
   # "https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/tecnologia/ia/portada",
 ]
 
+# Límite de items por feed (arXiv, 3; otros, 6)
+DEFAULT_LIMIT = 6
+ARXIV_LIMIT   = 3
+
 # --------- Reglas de clasificación ----------
-# 1) Damos prioridad a INVESTIGACIÓN para que arXiv/papers no entren como "Modelos".
 CAT_RULES = [
-  ("Investigación", r"\b(arxiv|paper|research|benchmark|state[- ]of[- ]the[- ]art|sota|investigaci[oó]n)\b"),
   ("Modelos", r"\b(model|gpt|llama|mistral|gemma|embedding|diffusion|clip|transformer)\w*\b"),
   ("Productos", r"\b(launch|releas|introduc|announc|plataforma|app|feature|availability|presenta|lanza|anuncia)\w*\b"),
   ("Herramientas", r"\b(sdk|api|tool|agent|workflow|automation|rpa|plugin|mcp)\w*\b"),
+  ("Investigación", r"\b(arxiv|paper|research|benchmark|state[- ]of[- ]the[- ]art|sota|investigaci[oó]n)\b"),
   ("Compliance/Regulación", r"\b(eu ai act|gdpr|compliance|regulation|policy|licen|copyright|privacy|regulaci[oó]n)\w*\b"),
   ("Oportunidades", r"\b(grant|program|jobs|certification|partner|beta|funding|convocatoria|beca|certificaci[oó]n)\w*\b"),
 ]
 
+# Señales fuertes de ALTA (EN/ES)
+ALTA_STRONG_RX = r"\b(launch\w*|releas\w*|introduc\w*|announc\w*|anunci\w*|lanza\w*|general availability|deprecat\w*|sunset\w*|retirad\w*|end[- ]of[- ]life|eol|price|pricing|cost|billing|security|breach\w*|leak\w*|vulnerab\w*|cve-\d{4}-\d+|patch|zero[- ]day|incident\w*|eu ai act|gdpr|licen\w*|policy|terms)\b"
+
 PRIORITY_RULES = [
-  # Lanzamientos/GA, cambios críticos, seguridad, precios y normativa (EN/ES)
-  ("ALTA", r"\b(launch\w*|releas\w*|introduc\w*|announc\w*|anunci\w*|lanza\w*|general availability|deprecat\w*|sunset\w*|retirad\w*|end[- ]of[- ]life|eol|price|pricing|cost|billing|security|breach\w*|leak\w*|vulnerab\w*|cve-\d{4}-\d+|patch|zero[- ]day|incident\w*|eu ai act|gdpr|licen\w*|policy|terms)\b"),
+  ("ALTA",  ALTA_STRONG_RX),
   ("MEDIA", r"\b(update\w*|beta|preview|roll[- ]?out|research|paper|arxiv|benchmark|api|sdk|agent)\b"),
-  ("BAJA", r".*"),
+  ("BAJA",  r".*"),
 ]
 
 PRIORITY_ORDER = {"ALTA": 0, "MEDIA": 1, "BAJA": 2}
@@ -61,47 +66,48 @@ def pick_summary(e) -> str:
     c = getattr(e, "content", None)
     if c:
         try:
+            # feedparser puede dar dict o objeto con .value
             if isinstance(c[0], dict) and "value" in c[0]:
                 return c[0]["value"]
-            return c[0].value
+            return c[0].value  # type: ignore[attr-defined]
         except Exception:
             pass
     return ""
 
-def classify(text: str, link: str = "", source: str = ""):
-    t = (text + " " + url_text(link)).lower()
+def classify(text: str):
+    t = text.lower()
     cat = next((c for c, rx in CAT_RULES if re.search(rx, t)), "Otros")
     pr  = next((p for p, rx in PRIORITY_RULES if re.search(rx, t)), "BAJA")
-
-    # Guardas por dominio: arXiv a MEDIA por defecto salvo eventos realmente críticos.
-    dom = urlparse(link).netloc.lower()
-    if ("arxiv.org" in dom or "arxiv" in source.lower()) and pr == "ALTA":
-        if not re.search(r"(security|deprecat|price|pricing|gdpr|eu ai act|licen|policy|terms|eol|end[- ]of[- ]life|general availability)", t):
-            pr = "MEDIA"
-
     return cat, pr
+
+def adjust_priority_for_source(title: str, summary: str, link: str, pr: str) -> str:
+    """Democión específica: arXiv = MEDIA salvo señales fuertes de ALTA."""
+    host = urlparse(link).netloc.lower()
+    text = f"{title} {summary} {url_text(link)}".lower()
+    if "arxiv.org" in host:
+        if not re.search(ALTA_STRONG_RX, text):
+            return "MEDIA"
+    return pr
 
 # --------- Recolección ----------
 items = []
 for url in SOURCES:
-    try:
-        feed = feedparser.parse(url)
-    except Exception:
-        continue
-    src = getattr(getattr(feed, "feed", {}), "title", "") or urlparse(url).netloc
-    entries = getattr(feed, "entries", []) or []
+    feed = feedparser.parse(url)
+    src = getattr(getattr(feed, "feed", {}), "title", url)
 
-    # Menos “ruido” de arXiv: máximo 3 por feed; otros hasta 6
-    is_arxiv = "arxiv.org" in url
-    max_items = 3 if is_arxiv else 6
+    per_feed_limit = ARXIV_LIMIT if "arxiv.org" in url else DEFAULT_LIMIT
 
-    for e in entries[:max_items]:
+    for e in feed.entries[:per_feed_limit]:
         title = norm(getattr(e, "title", ""))
         link  = norm(getattr(e, "link", ""))
         if not link.startswith("http"):
             continue
         summ  = norm(pick_summary(e))
-        cat, pr = classify(f"{title} {summ}", link, src)
+
+        base_text = f"{title} {summ} {url_text(link)}"
+        cat, pr = classify(base_text)
+        pr = adjust_priority_for_source(title, summ, link, pr)
+
         items.append({
             "source": norm(src),
             "title": title,
