@@ -1,4 +1,4 @@
-# INTEL Diario – 2025-09-05T05:21:20.723713+00:00
+# INTEL Diario – 2025-09-05T12:49:24.258235+00:00
 
 - **[Modelos/ALTA] AutoGrid AI: Deep Reinforcement Learning Framework for Autonomous Microgrid Management** — cs.LG updates on arXiv.org | https://arxiv.org/abs/2509.03666
 - **[Modelos/ALTA] CEHR-GPT: A Scalable Multi-Task Foundation Model for Electronic Health Records** — cs.LG updates on arXiv.org | https://arxiv.org/abs/2509.03643
