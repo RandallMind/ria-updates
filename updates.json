@@ -1,215 +1,145 @@
-{
-  "generated_at": "2025-09-05T23:29:44.152196+00:00",
-  "items": [
-    {
-      "source": "cs.LG updates on arXiv.org",
-      "title": "CEHR-GPT: A Scalable Multi-Task Foundation Model for Electronic Health Records",
-      "link": "https://arxiv.org/abs/2509.03643",
-      "summary": "arXiv:2509.03643v1 Announce Type: new Abstract: Electronic Health Records (EHRs) provide a rich, longitudinal view of patient health and hold significant potential for advancing clinical decision support, risk prediction, and data-driven healthcare research. However, most artificial intelligence (AI) models for EHRs are designed for narrow, single-purpose tasks, limiting their generalizability and utility in real-world settings. Here, we present CEHR-GPT, a general-purpose foundation model for EHR data that unifies three essential capabilities - feature representation, zero-shot prediction, and synthetic data generation - within a single architecture. To support temporal reasoning over clinical sequences, \\cehrgpt{} incorporates a novel time-token-based learning framework that explicitly encodes patients' dynamic timelines into the model structure. CEHR-GPT demonstrates strong performance across all three tasks and generalizes effectively to external datasets through vocabulary expansion and fine-tuning. Its versatility enables rapid model development, cohort discovery, and patient outcome forecasting without the need for task-specific retraining.",
-      "category": "Modelos",
-      "priority": "ALTA",
-      "impact": "",
-      "risks": ""
-    },
-    {
-      "source": "cs.AI updates on arXiv.org",
-      "title": "Diffusion-RL Based Air Traffic Conflict Detection and Resolution Method",
-      "link": "https://arxiv.org/abs/2509.03550",
-      "summary": "arXiv:2509.03550v1 Announce Type: new Abstract: In the context of continuously rising global air traffic, efficient and safe Conflict Detection and Resolution (CD&amp;R) is paramount for air traffic management. Although Deep Reinforcement Learning (DRL) offers a promising pathway for CD&amp;R automation, existing approaches commonly suffer from a \"unimodal bias\" in their policies. This leads to a critical lack of decision-making flexibility when confronted with complex and dynamic constraints, often resulting in \"decision deadlocks.\" To overcome this limitation, this paper pioneers the integration of diffusion probabilistic models into the safety-critical task of CD&amp;R, proposing a novel autonomous conflict resolution framework named Diffusion-AC. Diverging from conventional methods that converge to a single optimal solution, our framework models its policy as a reverse denoising process guided by a value function, enabling it to generate a rich, high-quality, and multimodal action distribution. This core architecture is complemented by a Density-Progressive Safety Curriculum (DPSC), a training mechanism that ensures stable and efficient learning as the agent progresses from sparse to high-density traffic environments. Extensive simulation experiments demonstrate that the proposed method significantly outperforms a suite of state-of-the-art DRL benchmarks. Most critically, in the most challenging high-density scenarios, Diffusion-AC not only maintains a high success rate of 94.1% but also reduces the incidence of Near Mid-Air Collisions (NMACs) by approximately 59% compared to the next-best-performing baseline, significantly enhancing the system's safety margin. This performance leap stems from its unique multimodal decision-making capability, which allows the agent to flexibly switch to effective alternative maneuvers.",
-      "category": "Modelos",
-      "priority": "ALTA",
-      "impact": "",
-      "risks": ""
-    },
-    {
-      "source": "cs.CL updates on arXiv.org",
-      "title": "Enhancing Speech Large Language Models through Reinforced Behavior Alignment",
-      "link": "https://arxiv.org/abs/2509.03526",
-      "summary": "arXiv:2509.03526v1 Announce Type: new Abstract: The recent advancements of Large Language Models (LLMs) have spurred considerable research interest in extending their linguistic capabilities beyond text to other modalities, which leads to emergence of speech-based LLMs (SpeechLMs) with capability of processing user request in either speech or textual formats. However, owing to inter-modal discrepancies, these SpeechLMs still exhibit a significant performance gap compared to their text-based LLM counterparts in instruction-following, particularly when confronted with the dynamic and variable nature of user speech. To address this challenge, this paper introduces a framework termed Reinforced Behavior Alignment (RBA), designed to bolster the language generation proficiency of SpeechLMs. Instead of relying on supervised fine-tuning from human annotations, RBA employs a self-synthesis methodology to generate extensive, high-fidelity alignment data by a powerful teacher LLM. Then SpeechLMs is aligned its behavior with that of a teacher using a reinforcement learning-based approach. Experimental results demonstrate that this method effectively enhances the instruction-following capabilities of SpeechLMs that outperform conventional distillation baselines. Crucially, we demonstrate that RBA can be seamlessly extended to tasks such including spoken question answering and speech-to-text translation, attaining state-of-the-art performance on open benchmarks with only self-generated data.",
-      "category": "Modelos",
-      "priority": "ALTA",
-      "impact": "",
-      "risks": ""
-    },
-    {
-      "source": "cs.CL updates on arXiv.org",
-      "title": "Multilevel Analysis of Cryptocurrency News using RAG Approach with Fine-Tuned Mistral Large Language Model",
-      "link": "https://arxiv.org/abs/2509.03527",
-      "summary": "arXiv:2509.03527v1 Announce Type: new Abstract: In the paper, we consider multilevel multitask analysis of cryptocurrency news using a fine-tuned Mistral 7B large language model with retrieval-augmented generation (RAG). On the first level of analytics, the fine-tuned model generates graph and text summaries with sentiment scores as well as JSON representations of summaries. Higher levels perform hierarchical stacking that consolidates sets of graph-based and text-based summaries as well as summaries of summaries into comprehensive reports. The combination of graph and text summaries provides complementary views of cryptocurrency news. The model is fine-tuned with 4-bit quantization using the PEFT/LoRA approach. The representation of cryptocurrency news as knowledge graph can essentially eliminate problems with large language model hallucinations. The obtained results demonstrate that the use of fine-tuned Mistral 7B LLM models for multilevel cryptocurrency news analysis can conduct informative qualitative and quantitative analytics, providing important insights.",
-      "category": "Modelos",
-      "priority": "ALTA",
-      "impact": "",
-      "risks": ""
-    },
-    {
-      "source": "cs.AI updates on arXiv.org",
-      "title": "Multilinear and Linear Programs for Partially Identifiable Queries in Quasi-Markovian Structural Causal Models",
-      "link": "https://arxiv.org/abs/2509.03548",
-      "summary": "arXiv:2509.03548v1 Announce Type: new Abstract: We investigate partially identifiable queries in a class of causal models. We focus on acyclic Structural Causal Models that are quasi-Markovian (that is, each endogenous variable is connected with at most one exogenous confounder). We look into scenarios where endogenous variables are observed (and a distribution over them is known), while exogenous variables are not fully specified. This leads to a representation that is in essence a Bayesian network where the distribution of root variables is not uniquely determined. In such circumstances, it may not be possible to precisely compute a probability value of interest. We thus study the computation of tight probability bounds, a problem that has been solved by multilinear programming in general, and by linear programming when a single confounded component is intervened upon. We present a new algorithm to simplify the construction of such programs by exploiting input probabilities over endogenous variables. For scenarios with a single intervention, we apply column generation to compute a probability bound through a sequence of auxiliary linear integer programs, thus showing that a representation with polynomial cardinality for exogenous variables is possible. Experiments show column generation techniques to be superior to existing methods.",
-      "category": "Modelos",
-      "priority": "ALTA",
-      "impact": "",
-      "risks": ""
-    },
-    {
-      "source": "cs.LG updates on arXiv.org",
-      "title": "Nonnegative matrix factorization and the principle of the common cause",
-      "link": "https://arxiv.org/abs/2509.03652",
-      "summary": "arXiv:2509.03652v1 Announce Type: new Abstract: Nonnegative matrix factorization (NMF) is a known unsupervised data-reduction method. The principle of the common cause (PCC) is a basic methodological approach in probabilistic causality, which seeks an independent mixture model for the joint probability of two dependent random variables. It turns out that these two concepts are closely related. This relationship is explored reciprocally for several datasets of gray-scale images, which are conveniently mapped into probability models. On one hand, PCC provides a predictability tool that leads to a robust estimation of the effective rank of NMF. Unlike other estimates (e.g., those based on the Bayesian Information Criteria), our estimate of the rank is stable against weak noise. We show that NMF implemented around this rank produces features (basis images) that are also stable against noise and against seeds of local optimization, thereby effectively resolving the NMF nonidentifiability problem. On the other hand, NMF provides an interesting possibility of implementing PCC in an approximate way, where larger and positively correlated joint probabilities tend to be explained better via the independent mixture model. We work out a clustering method, where data points with the same common cause are grouped into the same cluster. We also show how NMF can be employed for data denoising.",
-      "category": "Modelos",
-      "priority": "ALTA",
-      "impact": "",
-      "risks": ""
-    },
-    {
-      "source": "cs.AI updates on arXiv.org",
-      "title": "PG-Agent: An Agent Powered by Page Graph",
-      "link": "https://arxiv.org/abs/2509.03536",
-      "summary": "arXiv:2509.03536v1 Announce Type: new Abstract: Graphical User Interface (GUI) agents possess significant commercial and social value, and GUI agents powered by advanced multimodal large language models (MLLMs) have demonstrated remarkable potential. Currently, existing GUI agents usually utilize sequential episodes of multi-step operations across pages as the prior GUI knowledge, which fails to capture the complex transition relationship between pages, making it challenging for the agents to deeply perceive the GUI environment and generalize to new scenarios. Therefore, we design an automated pipeline to transform the sequential episodes into page graphs, which explicitly model the graph structure of the pages that are naturally connected by actions. To fully utilize the page graphs, we further introduce Retrieval-Augmented Generation (RAG) technology to effectively retrieve reliable perception guidelines of GUI from them, and a tailored multi-agent framework PG-Agent with task decomposition strategy is proposed to be injected with the guidelines so that it can generalize to unseen scenarios. Extensive experiments on various benchmarks demonstrate the effectiveness of PG-Agent, even with limited episodes for page graph construction.",
-      "category": "Modelos",
-      "priority": "ALTA",
-      "impact": "",
-      "risks": ""
-    },
-    {
-      "source": "cs.CL updates on arXiv.org",
-      "title": "Speech-Based Cognitive Screening: A Systematic Evaluation of LLM Adaptation Strategies",
-      "link": "https://arxiv.org/abs/2509.03525",
-      "summary": "arXiv:2509.03525v1 Announce Type: new Abstract: Over half of US adults with Alzheimer disease and related dementias remain undiagnosed, and speech-based screening offers a scalable detection approach. We compared large language model adaptation strategies for dementia detection using the DementiaBank speech corpus, evaluating nine text-only models and three multimodal audio-text models on recordings from DementiaBank speech corpus. Adaptations included in-context learning with different demonstration selection policies, reasoning-augmented prompting, parameter-efficient fine-tuning, and multimodal integration. Results showed that class-centroid demonstrations achieved the highest in-context learning performance, reasoning improved smaller models, and token-level fine-tuning generally produced the best scores. Adding a classification head substantially improved underperforming models. Among multimodal models, fine-tuned audio-text systems performed well but did not surpass the top text-only models. These findings highlight that model adaptation strategies, including demonstration selection, reasoning design, and tuning method, critically influence speech-based dementia detection, and that properly adapted open-weight models can match or exceed commercial systems.",
-      "category": "Modelos",
-      "priority": "ALTA",
-      "impact": "",
-      "risks": ""
-    },
-    {
-      "source": "cs.LG updates on arXiv.org",
-      "title": "The Optimiser Hidden in Plain Sight: Training with the Loss Landscape's Induced Metric",
-      "link": "https://arxiv.org/abs/2509.03594",
-      "summary": "arXiv:2509.03594v1 Announce Type: new Abstract: We present a class of novel optimisers for training neural networks that makes use of the Riemannian metric naturally induced when the loss landscape is embedded in higher-dimensional space. This is the same metric that underlies common visualisations of loss landscapes. By taking this geometric perspective literally and using the induced metric, we develop a new optimiser and compare it to existing methods, namely: SGD, Adam, AdamW, and Muon, across a range of tasks and architectures. Empirically, we conclude that this new class of optimisers is highly effective in low dimensional examples, and provides slight improvement over state-of-the-art methods for training neural networks. These new optimisers have theoretically desirable properties. In particular, the effective learning rate is automatically decreased in regions of high curvature acting as a smoothed out form of gradient clipping. Similarly, one variant of these optimisers can also be viewed as inducing an effective scheduled learning rate and decoupled weight decay is the natural choice from our geometric perspective. The basic method can be used to modify any existing preconditioning method. The new optimiser has a computational complexity comparable to that of Adam.",
-      "category": "Modelos",
-      "priority": "ALTA",
-      "impact": "",
-      "risks": ""
-    },
-    {
-      "source": "OpenAI News",
-      "title": "Expanding economic opportunity with AI",
-      "link": "https://openai.com/index/expanding-economic-opportunity-with-ai",
-      "summary": "OpenAI is launching a Jobs Platform and new Certifications to connect workers with jobs, training, and certifications. Learn how we’re expanding economic opportunity and making AI skills more accessible.",
-      "category": "Productos",
-      "priority": "ALTA",
-      "impact": "",
-      "risks": ""
-    },
-    {
-      "source": "OpenAI News",
-      "title": "OpenAI and Greek Government launch ‘OpenAI for Greece’",
-      "link": "https://openai.com/global-affairs/openai-for-greece",
-      "summary": "OpenAI and the Greek Government have launched “OpenAI for Greece” to bring ChatGPT Edu into secondary schools and support responsible AI learning. This partnership aims to boost AI literacy, fuel local start-ups, and drive national economic growth.",
-      "category": "Productos",
-      "priority": "ALTA",
-      "impact": "",
-      "risks": ""
-    },
-    {
-      "source": "Hugging Face - Blog",
-      "title": "MCP for Research: How to Connect AI to Research Tools",
-      "link": "https://huggingface.co/blog/mcp-for-research",
-      "summary": "",
-      "category": "Herramientas",
-      "priority": "MEDIA",
-      "impact": "",
-      "risks": ""
-    },
-    {
-      "source": "OpenAI News",
-      "title": "Why language models hallucinate",
-      "link": "https://openai.com/index/why-language-models-hallucinate",
-      "summary": "OpenAI’s new research explains why language models hallucinate. The findings show how improved evaluations can enhance AI reliability, honesty, and safety.",
-      "category": "Modelos",
-      "priority": "MEDIA",
-      "impact": "",
-      "risks": ""
-    },
-    {
-      "source": "Hugging Face - Blog",
-      "title": "Generate Images with Claude and Hugging Face",
-      "link": "https://huggingface.co/blog/claude-and-mcp",
-      "summary": "",
-      "category": "Herramientas",
-      "priority": "BAJA",
-      "impact": "",
-      "risks": ""
-    },
-    {
-      "source": "OpenAI News",
-      "title": "Building more helpful ChatGPT experiences for everyone",
-      "link": "https://openai.com/index/building-more-helpful-chatgpt-experiences-for-everyone",
-      "summary": "We’re partnering with experts, strengthening protections for teens with parental controls, and routing sensitive conversations to reasoning models in ChatGPT.",
-      "category": "Modelos",
-      "priority": "BAJA",
-      "impact": "",
-      "risks": ""
-    },
-    {
-      "source": "OpenAI News",
-      "title": "GPT-5 bio bug bounty call",
-      "link": "https://openai.com/gpt-5-bio-bug-bounty",
-      "summary": "OpenAI invites researchers to its Bio Bug Bounty. Test GPT-5’s safety with a universal jailbreak prompt and win up to $25,000.",
-      "category": "Modelos",
-      "priority": "BAJA",
-      "impact": "",
-      "risks": ""
-    },
-    {
-      "source": "Hugging Face - Blog",
-      "title": "Welcome EmbeddingGemma, Google's new efficient embedding model",
-      "link": "https://huggingface.co/blog/embeddinggemma",
-      "summary": "",
-      "category": "Modelos",
-      "priority": "BAJA",
-      "impact": "",
-      "risks": ""
-    },
-    {
-      "source": "Hugging Face - Blog",
-      "title": "From Zero to GPU: A Guide to Building and Scaling Production-Ready CUDA Kernels",
-      "link": "https://huggingface.co/blog/kernel-builder",
-      "summary": "",
-      "category": "Otros",
-      "priority": "BAJA",
-      "impact": "",
-      "risks": ""
-    },
-    {
-      "source": "Hugging Face - Blog",
-      "title": "Make your ZeroGPU Spaces go brrr with PyTorch ahead-of-time compilation",
-      "link": "https://huggingface.co/blog/zerogpu-aoti",
-      "summary": "",
-      "category": "Otros",
-      "priority": "BAJA",
-      "impact": "",
-      "risks": ""
-    },
-    {
-      "source": "Hugging Face - Blog",
-      "title": "TextQuests: How Good are LLMs at Text-Based Video Games?",
-      "link": "https://huggingface.co/blog/textquests",
-      "summary": "",
-      "category": "Otros",
-      "priority": "BAJA",
-      "impact": "",
-      "risks": ""
-    },
-    {
-      "source": "OpenAI News",
-      "title": "Vijaye Raji to become CTO of Applications with acquisition of Statsig",
-      "link": "https://openai.com/index/vijaye-raji-to-become-cto-of-applications-with-acquisition-of-statsig",
-      "summary": "Vijaye Raji will step into a new role as CTO of Applications, reporting to CEO of Applications, Fidji Simo, following the acquisition of Statsig.",
-      "category": "Productos",
-      "priority": "BAJA",
-      "impact": "",
-      "risks": ""
-    }
-  ]
-}
+import feedparser, json, hashlib, re
+from datetime import datetime, timezone
+from urllib.parse import urlparse, unquote
+
+# --------- Fuentes ----------
+SOURCES = [
+  "https://openai.com/blog/rss.xml",
+  "https://ai.googleblog.com/atom.xml",
+  "https://azure.microsoft.com/en-us/updates/feed/",
+  "https://about.fb.com/news/tag/ai/feed/",
+  "https://www.anthropic.com/news.xml",
+  "https://mistral.ai/news/feed.xml",
+  "https://huggingface.co/blog/feed.xml",
+  "https://arxiv.org/rss/cs.AI",
+  "https://arxiv.org/rss/cs.LG",
+  "https://arxiv.org/rss/cs.CL",
+  # --- ES / LATAM (activa quitando el "#") ---
+  # "https://www.xataka.com/tag/inteligencia-artificial/rss2.xml",
+  # "https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/tecnologia/ia/portada",
+]
+
+DEFAULT_LIMIT = 6
+ARXIV_LIMIT   = 3
+
+# --------- Reglas de clasificación ----------
+# Ponemos INVESTIGACIÓN primero para que matchee antes que "Modelos"
+CAT_RULES = [
+  ("Investigación", r"\b(arxiv|paper|research|benchmark|state[- ]of[- ]the[- ]art|sota|investigaci[oó]n)\b"),
+  ("Modelos", r"\b(model|gpt|llama|mistral|gemma|embedding|diffusion|clip|transformer)\w*\b"),
+  ("Productos", r"\b(launch|releas|introduc|announc|plataforma|app|feature|availability|presenta|lanza|anuncia)\w*\b"),
+  ("Herramientas", r"\b(sdk|api|tool|agent|workflow|automation|rpa|plugin|mcp)\w*\b"),
+  ("Compliance/Regulación", r"\b(eu ai act|gdpr|compliance|regulation|policy|licen|copyright|privacy|regulaci[oó]n)\w*\b"),
+  ("Oportunidades", r"\b(grant|program|jobs|certification|partner|beta|funding|convocatoria|beca|certificaci[oó]n)\w*\b"),
+]
+
+# Señales fuertes para ALTA (incluye “GA” abreviado)
+ALTA_STRONG_RX = r"\b(launch\w*|releas\w*|introduc\w*|announc\w*|anunci\w*|lanza\w*|general availability|(?<![a-z])ga(?![a-z])|deprecat\w*|sunset\w*|retirad\w*|end[- ]of[- ]life|eol|price|pricing|cost|billing|security|breach\w*|leak\w*|vulnerab\w*|cve-\d{4}-\d+|patch|zero[- ]day|incident\w*|eu ai act|gdpr|licen\w*|policy|terms)\b"
+
+PRIORITY_RULES = [
+  ("ALTA",  ALTA_STRONG_RX),
+  ("MEDIA", r"\b(update\w*|beta|preview|roll[- ]?out|research|paper|arxiv|benchmark|api|sdk|agent)\b"),
+  ("BAJA",  r".*"),
+]
+
+PRIORITY_ORDER = {"ALTA": 0, "MEDIA": 1, "BAJA": 2}
+
+# --------- Utilidades ----------
+def norm(x: str) -> str:
+    if not x:
+        return ""
+    return re.sub(r"\s+", " ", x).strip()
+
+def url_text(link: str) -> str:
+    """Usa host y path para detectar 'introducing', 'launch', etc."""
+    try:
+        p = urlparse(link)
+        return unquote((p.netloc + " " + p.path).replace("-", " "))
+    except Exception:
+        return ""
+
+def pick_summary(e) -> str:
+    for key in ("summary", "description"):
+        v = getattr(e, key, None)
+        if v: return v
+    c = getattr(e, "content", None)
+    if c:
+        try:
+            if isinstance(c[0], dict) and "value" in c[0]:
+                return c[0]["value"]
+            return c[0].value  # type: ignore[attr-defined]
+        except Exception:
+            pass
+    return ""
+
+def classify(text: str):
+    t = text.lower()
+    cat = next((c for c, rx in CAT_RULES if re.search(rx, t)), "Otros")
+    pr  = next((p for p, rx in PRIORITY_RULES if re.search(rx, t)), "BAJA")
+    return cat, pr
+
+def adjust_for_source(title: str, summary: str, link: str, cat: str, pr: str):
+    """arXiv => Investigación + MEDIA salvo señales fuertes."""
+    host = urlparse(link).netloc.lower()
+    text = f"{title} {summary} {url_text(link)}".lower()
+    if "arxiv.org" in host:
+        cat = "Investigación"
+        if not re.search(ALTA_STRONG_RX, text):
+            pr = "MEDIA"
+    return cat, pr
+
+# --------- Recolección ----------
+items = []
+for url in SOURCES:
+    try:
+        feed = feedparser.parse(url)
+    except Exception:
+        continue
+    src = getattr(getattr(feed, "feed", {}), "title", "") or url
+    entries = getattr(feed, "entries", []) or []
+    per_feed_limit = ARXIV_LIMIT if "arxiv.org" in url else DEFAULT_LIMIT
+
+    for e in entries[:per_feed_limit]:
+        title = norm(getattr(e, "title", ""))
+        link  = norm(getattr(e, "link", ""))
+        if not link.startswith("http"):
+            continue
+        summ  = norm(pick_summary(e))
+
+        base_text = f"{title} {summ} {url_text(link)}"
+        cat, pr = classify(base_text)
+        cat, pr = adjust_for_source(title, summ, link, cat, pr)
+
+        items.append({
+            "source": norm(src),
+            "title": title,
+            "link": link,
+            "summary": summ,
+            "category": cat,
+            "priority": pr,
+            "impact": "",
+            "risks": ""
+        })
+
+# De-dup y orden
+seen, clean = set(), []
+for it in items:
+    key = it["link"] or it["title"].lower()
+    h = hashlib.md5(key.encode("utf-8")).hexdigest()
+    if h in seen: 
+        continue
+    seen.add(h)
+    clean.append(it)
+
+clean.sort(key=lambda it: (PRIORITY_ORDER.get(it["priority"], 9), it["category"], it["title"]))
+
+payload = { "generated_at": datetime.now(timezone.utc).isoformat(), "items": clean[:50] }
+
+# --------- Salida ----------
+with open("updates.json","w",encoding="utf-8") as f:
+    json.dump(payload, f, ensure_ascii=False, indent=2)
+
+with open("updates.md","w",encoding="utf-8") as f:
+    f.write(f"# INTEL Diario – {payload['generated_at']}\n\n")
+    for it in payload["items"]:
+        f.write(f"- **[{it['category']}/{it['priority']}] {it['title']}** — {it['source']} | {it['link']}\n")
