@@ -20,11 +20,12 @@ SOURCES = [
 ]
 
 # --------- Reglas de clasificación ----------
+# 1) Damos prioridad a INVESTIGACIÓN para que arXiv/papers no entren como "Modelos".
 CAT_RULES = [
+  ("Investigación", r"\b(arxiv|paper|research|benchmark|state[- ]of[- ]the[- ]art|sota|investigaci[oó]n)\b"),
   ("Modelos", r"\b(model|gpt|llama|mistral|gemma|embedding|diffusion|clip|transformer)\w*\b"),
   ("Productos", r"\b(launch|releas|introduc|announc|plataforma|app|feature|availability|presenta|lanza|anuncia)\w*\b"),
   ("Herramientas", r"\b(sdk|api|tool|agent|workflow|automation|rpa|plugin|mcp)\w*\b"),
-  ("Investigación", r"\b(arxiv|paper|research|benchmark|state[- ]of[- ]the[- ]art|sota|investigaci[oó]n)\b"),
   ("Compliance/Regulación", r"\b(eu ai act|gdpr|compliance|regulation|policy|licen|copyright|privacy|regulaci[oó]n)\w*\b"),
   ("Oportunidades", r"\b(grant|program|jobs|certification|partner|beta|funding|convocatoria|beca|certificaci[oó]n)\w*\b"),
 ]
@@ -53,7 +54,6 @@ def url_text(link: str) -> str:
         return ""
 
 def pick_summary(e) -> str:
-    # Intenta summary/description; si no, usa content[0]
     for key in ("summary", "description"):
         v = getattr(e, key, None)
         if v:
@@ -63,15 +63,22 @@ def pick_summary(e) -> str:
         try:
             if isinstance(c[0], dict) and "value" in c[0]:
                 return c[0]["value"]
-            return c[0].value  # FeedParserDict soporta acceso por atributo
+            return c[0].value
         except Exception:
             pass
     return ""
 
-def classify(text: str, link: str = ""):
+def classify(text: str, link: str = "", source: str = ""):
     t = (text + " " + url_text(link)).lower()
     cat = next((c for c, rx in CAT_RULES if re.search(rx, t)), "Otros")
     pr  = next((p for p, rx in PRIORITY_RULES if re.search(rx, t)), "BAJA")
+
+    # Guardas por dominio: arXiv a MEDIA por defecto salvo eventos realmente críticos.
+    dom = urlparse(link).netloc.lower()
+    if ("arxiv.org" in dom or "arxiv" in source.lower()) and pr == "ALTA":
+        if not re.search(r"(security|deprecat|price|pricing|gdpr|eu ai act|licen|policy|terms|eol|end[- ]of[- ]life|general availability)", t):
+            pr = "MEDIA"
+
     return cat, pr
 
 # --------- Recolección ----------
@@ -83,13 +90,18 @@ for url in SOURCES:
         continue
     src = getattr(getattr(feed, "feed", {}), "title", "") or urlparse(url).netloc
     entries = getattr(feed, "entries", []) or []
-    for e in entries[:6]:
+
+    # Menos “ruido” de arXiv: máximo 3 por feed; otros hasta 6
+    is_arxiv = "arxiv.org" in url
+    max_items = 3 if is_arxiv else 6
+
+    for e in entries[:max_items]:
         title = norm(getattr(e, "title", ""))
         link  = norm(getattr(e, "link", ""))
         if not link.startswith("http"):
             continue
         summ  = norm(pick_summary(e))
-        cat, pr = classify(f"{title} {summ}", link)
+        cat, pr = classify(f"{title} {summ}", link, src)
         items.append({
             "source": norm(src),
             "title": title,
