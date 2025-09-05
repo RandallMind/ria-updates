@@ -1,4 +1,4 @@
-# INTEL Diario – 2025-09-05T23:29:44.152196+00:00
+# INTEL Diario – 2025-09-05T23:39:41.496640+00:00
 
 - **[Modelos/ALTA] CEHR-GPT: A Scalable Multi-Task Foundation Model for Electronic Health Records** — cs.LG updates on arXiv.org | https://arxiv.org/abs/2509.03643
 - **[Modelos/ALTA] Diffusion-RL Based Air Traffic Conflict Detection and Resolution Method** — cs.AI updates on arXiv.org | https://arxiv.org/abs/2509.03550
