@@ -1,5 +1,5 @@
 {
-  "generated_at": "2025-09-05T12:49:24.258235+00:00",
+  "generated_at": "2025-09-05T23:05:58.787824+00:00",
   "items": [
     {
       "source": "cs.LG updates on arXiv.org",
@@ -56,16 +56,6 @@
       "title": "Explainable Knowledge Graph Retrieval-Augmented Generation (KG-RAG) with KG-SMILE",
       "link": "https://arxiv.org/abs/2509.03626",
       "summary": "arXiv:2509.03626v1 Announce Type: new Abstract: Generative AI, such as Large Language Models (LLMs), has achieved impressive progress but still produces hallucinations and unverifiable claims, limiting reliability in sensitive domains. Retrieval-Augmented Generation (RAG) improves accuracy by grounding outputs in external knowledge, especially in domains like healthcare, where precision is vital. However, RAG remains opaque and essentially a black box, heavily dependent on data quality. We developed a method-agnostic, perturbation-based framework that provides token and component-level interoperability for Graph RAG using SMILE and named it as Knowledge-Graph (KG)-SMILE. By applying controlled perturbations, computing similarities, and training weighted linear surrogates, KG-SMILE identifies the graph entities and relations most influential to generated outputs, thereby making RAG more transparent. We evaluate KG-SMILE using comprehensive attribution metrics, including fidelity, faithfulness, consistency, stability, and accuracy. Our findings show that KG-SMILE produces stable, human-aligned explanations, demonstrating its capacity to balance model effectiveness with interpretability and thereby fostering greater transparency and trust in machine learning technologies.",
-      "category": "Modelos",
-      "priority": "ALTA",
-      "impact": "",
-      "risks": ""
-    },
-    {
-      "source": "OpenAI News",
-      "title": "Introducing gpt-realtime and Realtime API updates",
-      "link": "https://openai.com/index/introducing-gpt-realtime",
-      "summary": "We’re releasing a more advanced speech-to-speech model and new API capabilities including MCP server support, image input, and SIP phone calling support.",
       "category": "Modelos",
       "priority": "ALTA",
       "impact": "",
@@ -203,9 +193,9 @@
     },
     {
       "source": "OpenAI News",
-      "title": "Supporting nonprofit and community innovation",
-      "link": "https://openai.com/index/supporting-nonprofit-and-community-innovation",
-      "summary": "OpenAI launches a $50M People-First AI Fund to help U.S. nonprofits scale impact with AI. Applications open Sept 8–Oct 8, 2025 for grants in education, healthcare, research, and more.",
+      "title": "OpenAI and Greek Government launch ‘OpenAI for Greece’",
+      "link": "https://openai.com/global-affairs/openai-for-greece",
+      "summary": "OpenAI and the Greek Government have launched “OpenAI for Greece” to bring ChatGPT Edu into secondary schools and support responsible AI learning. This partnership aims to boost AI literacy, fuel local start-ups, and drive national economic growth.",
       "category": "Productos",
       "priority": "ALTA",
       "impact": "",
@@ -223,9 +213,9 @@
     },
     {
       "source": "OpenAI News",
-      "title": "Collective alignment: public input on our Model Spec",
-      "link": "https://openai.com/index/collective-alignment-aug-2025-updates",
-      "summary": "OpenAI surveyed over 1,000 people worldwide on how AI should behave and compared their views to our Model Spec. Learn how collective alignment is shaping AI defaults to better reflect diverse human values and perspectives.",
+      "title": "Why language models hallucinate",
+      "link": "https://openai.com/index/why-language-models-hallucinate",
+      "summary": "OpenAI’s new research explains why language models hallucinate. The findings show how improved evaluations can enhance AI reliability, honesty, and safety.",
       "category": "Modelos",
       "priority": "MEDIA",
       "impact": "",
@@ -246,6 +236,16 @@
       "title": "Building more helpful ChatGPT experiences for everyone",
       "link": "https://openai.com/index/building-more-helpful-chatgpt-experiences-for-everyone",
       "summary": "We’re partnering with experts, strengthening protections for teens with parental controls, and routing sensitive conversations to reasoning models in ChatGPT.",
+      "category": "Modelos",
+      "priority": "BAJA",
+      "impact": "",
+      "risks": ""
+    },
+    {
+      "source": "OpenAI News",
+      "title": "GPT-5 bio bug bounty call",
+      "link": "https://openai.com/gpt-5-bio-bug-bounty",
+      "summary": "OpenAI invites researchers to its Bio Bug Bounty. Test GPT-5’s safety with a universal jailbreak prompt and win up to $25,000.",
       "category": "Modelos",
       "priority": "BAJA",
       "impact": "",
