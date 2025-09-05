@@ -1,0 +1,125 @@
+{
+  "generated_at": "2025-09-05T04:29:02.779173+00:00",
+  "items": [
+    {
+      "source": "OpenAI News",
+      "title": "Expanding economic opportunity with AI",
+      "link": "https://openai.com/index/expanding-economic-opportunity-with-ai",
+      "summary": "OpenAI is launching a Jobs Platform and new Certifications to connect workers with jobs, training, and certifications. Learn how we’re expanding economic opportunity and making AI skills more accessible.",
+      "impact": "",
+      "risks": ""
+    },
+    {
+      "source": "OpenAI News",
+      "title": "Vijaye Raji to become CTO of Applications with acquisition of Statsig",
+      "link": "https://openai.com/index/vijaye-raji-to-become-cto-of-applications-with-acquisition-of-statsig",
+      "summary": "Vijaye Raji will step into a new role as CTO of Applications, reporting to CEO of Applications, Fidji Simo, following the acquisition of Statsig.",
+      "impact": "",
+      "risks": ""
+    },
+    {
+      "source": "OpenAI News",
+      "title": "Building more helpful ChatGPT experiences for everyone",
+      "link": "https://openai.com/index/building-more-helpful-chatgpt-experiences-for-everyone",
+      "summary": "We’re partnering with experts, strengthening protections for teens with parental controls, and routing sensitive conversations to reasoning models in ChatGPT.",
+      "impact": "",
+      "risks": ""
+    },
+    {
+      "source": "OpenAI News",
+      "title": "Introducing gpt-realtime and Realtime API updates",
+      "link": "https://openai.com/index/introducing-gpt-realtime",
+      "summary": "We’re releasing a more advanced speech-to-speech model and new API capabilities including MCP server support, image input, and SIP phone calling support.",
+      "impact": "",
+      "risks": ""
+    },
+    {
+      "source": "OpenAI News",
+      "title": "Supporting nonprofit and community innovation",
+      "link": "https://openai.com/index/supporting-nonprofit-and-community-innovation",
+      "summary": "OpenAI launches a $50M People-First AI Fund to help U.S. nonprofits scale impact with AI. Applications open Sept 8–Oct 8, 2025 for grants in education, healthcare, research, and more.",
+      "impact": "",
+      "risks": ""
+    },
+    {
+      "source": "Hugging Face - Blog",
+      "title": "Welcome EmbeddingGemma, Google's new efficient embedding model",
+      "link": "https://huggingface.co/blog/embeddinggemma",
+      "summary": "",
+      "impact": "",
+      "risks": ""
+    },
+    {
+      "source": "Hugging Face - Blog",
+      "title": "Make your ZeroGPU Spaces go brrr with PyTorch ahead-of-time compilation",
+      "link": "https://huggingface.co/blog/zerogpu-aoti",
+      "summary": "",
+      "impact": "",
+      "risks": ""
+    },
+    {
+      "source": "Hugging Face - Blog",
+      "title": "Generate Images with Claude and Hugging Face",
+      "link": "https://huggingface.co/blog/claude-and-mcp",
+      "summary": "",
+      "impact": "",
+      "risks": ""
+    },
+    {
+      "source": "Hugging Face - Blog",
+      "title": "From Zero to GPU: A Guide to Building and Scaling Production-Ready CUDA Kernels",
+      "link": "https://huggingface.co/blog/kernel-builder",
+      "summary": "",
+      "impact": "",
+      "risks": ""
+    },
+    {
+      "source": "Hugging Face - Blog",
+      "title": "MCP for Research: How to Connect AI to Research Tools",
+      "link": "https://huggingface.co/blog/mcp-for-research",
+      "summary": "",
+      "impact": "",
+      "risks": ""
+    },
+    {
+      "source": "cs.AI updates on arXiv.org",
+      "title": "PG-Agent: An Agent Powered by Page Graph",
+      "link": "https://arxiv.org/abs/2509.03536",
+      "summary": "arXiv:2509.03536v1 Announce Type: new  Abstract: Graphical User Interface (GUI) agents possess significant commercial and social value, and GUI agents powered by advanced multimodal large language models (MLLMs) have demonstrated remarkable potential. Currently, existing GUI agents usually utilize sequential episodes of multi-step operations across pages as the prior GUI knowledge, which fails to capture the complex transition relationship between pages, making it challenging for the agents to deeply perceive the GUI environment and generalize to new scenarios. Therefore, we design an automated pipeline to transform the sequential episodes into page graphs, which explicitly model the graph structure of the pages that are naturally connected by actions. To fully utilize the page graphs, we further introduce Retrieval-Augmented Generation (RAG) technology to effectively retrieve reliable perception guidelines of GUI from them, and a tailored multi-agent framework PG-Agent with task decomposition strategy is proposed to be injected with the guidelines so that it can generalize to unseen scenarios. Extensive experiments on various benchmarks demonstrate the effectiveness of PG-Agent, even with limited episodes for page graph construction.",
+      "impact": "",
+      "risks": ""
+    },
+    {
+      "source": "cs.AI updates on arXiv.org",
+      "title": "Multilinear and Linear Programs for Partially Identifiable Queries in Quasi-Markovian Structural Causal Models",
+      "link": "https://arxiv.org/abs/2509.03548",
+      "summary": "arXiv:2509.03548v1 Announce Type: new  Abstract: We investigate partially identifiable queries in a class of causal models. We focus on acyclic Structural Causal Models that are quasi-Markovian (that is, each endogenous variable is connected with at most one exogenous confounder). We look into scenarios where endogenous variables are observed (and a distribution over them is known), while exogenous variables are not fully specified. This leads to a representation that is in essence a Bayesian network where the distribution of root variables is not uniquely determined. In such circumstances, it may not be possible to precisely compute a probability value of interest. We thus study the computation of tight probability bounds, a problem that has been solved by multilinear programming in general, and by linear programming when a single confounded component is intervened upon. We present a new algorithm to simplify the construction of such programs by exploiting input probabilities over endogenous variables. For scenarios with a single intervention, we apply column generation to compute a probability bound through a sequence of auxiliary linear integer programs, thus showing that a representation with polynomial cardinality for exogenous variables is possible. Experiments show column generation techniques to be superior to existing methods.",
+      "impact": "",
+      "risks": ""
+    },
+    {
+      "source": "cs.AI updates on arXiv.org",
+      "title": "Diffusion-RL Based Air Traffic Conflict Detection and Resolution Method",
+      "link": "https://arxiv.org/abs/2509.03550",
+      "summary": "arXiv:2509.03550v1 Announce Type: new  Abstract: In the context of continuously rising global air traffic, efficient and safe Conflict Detection and Resolution (CD&amp;R) is paramount for air traffic management. Although Deep Reinforcement Learning (DRL) offers a promising pathway for CD&amp;R automation, existing approaches commonly suffer from a \"unimodal bias\" in their policies. This leads to a critical lack of decision-making flexibility when confronted with complex and dynamic constraints, often resulting in \"decision deadlocks.\" To overcome this limitation, this paper pioneers the integration of diffusion probabilistic models into the safety-critical task of CD&amp;R, proposing a novel autonomous conflict resolution framework named Diffusion-AC. Diverging from conventional methods that converge to a single optimal solution, our framework models its policy as a reverse denoising process guided by a value function, enabling it to generate a rich, high-quality, and multimodal action distribution. This core architecture is complemented by a Density-Progressive Safety Curriculum (DPSC), a training mechanism that ensures stable and efficient learning as the agent progresses from sparse to high-density traffic environments. Extensive simulation experiments demonstrate that the proposed method significantly outperforms a suite of state-of-the-art DRL benchmarks. Most critically, in the most challenging high-density scenarios, Diffusion-AC not only maintains a high success rate of 94.1% but also reduces the incidence of Near Mid-Air Collisions (NMACs) by approximately 59% compared to the next-best-performing baseline, significantly enhancing the system's safety margin. This performance leap stems from its unique multimodal decision-making capability, which allows the agent to flexibly switch to effective alternative maneuvers.",
+      "impact": "",
+      "risks": ""
+    },
+    {
+      "source": "cs.AI updates on arXiv.org",
+      "title": "Learning When to Plan: Efficiently Allocating Test-Time Compute for LLM Agents",
+      "link": "https://arxiv.org/abs/2509.03581",
+      "summary": "arXiv:2509.03581v1 Announce Type: new  Abstract: Training large language models (LLMs) to reason via reinforcement learning (RL) significantly improves their problem-solving capabilities. In agentic settings, existing methods like ReAct prompt LLMs to explicitly plan before every action; however, we demonstrate that always planning is computationally expensive and degrades performance on long-horizon tasks, while never planning further limits performance. To address this, we introduce a conceptual framework formalizing dynamic planning for LLM agents, enabling them to flexibly decide when to allocate test-time compute for planning. We propose a simple two-stage training pipeline: (1) supervised fine-tuning on diverse synthetic data to prime models for dynamic planning, and (2) RL to refine this capability in long-horizon environments. Experiments on the Crafter environment show that dynamic planning agents trained with this approach are more sample-efficient and consistently achieve more complex objectives. Additionally, we demonstrate that these agents can be effectively steered by human-written plans, surpassing their independent capabilities. To our knowledge, this work is the first to explore training LLM agents for dynamic test-time compute allocation in sequential decision-making tasks, paving the way for more efficient, adaptive, and controllable agentic systems.",
+      "impact": "",
+      "risks": ""
+    },
+    {
+      "source": "cs.AI updates on arXiv.org",
+      "title": "Explainable Knowledge Graph Retrieval-Augmented Generation (KG-RAG) with KG-SMILE",
+      "link": "https://arxiv.org/abs/2509.03626",
+      "summary": "arXiv:2509.03626v1 Announce Type: new  Abstract: Generative AI, such as Large Language Models (LLMs), has achieved impressive progress but still produces hallucinations and unverifiable claims, limiting reliability in sensitive domains. Retrieval-Augmented Generation (RAG) improves accuracy by grounding outputs in external knowledge, especially in domains like healthcare, where precision is vital. However, RAG remains opaque and essentially a black box, heavily dependent on data quality. We developed a method-agnostic, perturbation-based framework that provides token and component-level interoperability for Graph RAG using SMILE and named it as Knowledge-Graph (KG)-SMILE. By applying controlled perturbations, computing similarities, and training weighted linear surrogates, KG-SMILE identifies the graph entities and relations most influential to generated outputs, thereby making RAG more transparent. We evaluate KG-SMILE using comprehensive attribution metrics, including fidelity, faithfulness, consistency, stability, and accuracy. Our findings show that KG-SMILE produces stable, human-aligned explanations, demonstrating its capacity to balance model effectiveness with interpretability and thereby fostering greater transparency and trust in machine learning technologies.",
+      "impact": "",
+      "risks": ""
+    }
+  ]
+}
