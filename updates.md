@@ -1,18 +1,18 @@
-# INTEL Diario – 2025-09-05T23:23:44.475738+00:00
+# INTEL Diario – 2025-09-05T23:29:44.152196+00:00
 
-- **[Investigación/ALTA] Diffusion-RL Based Air Traffic Conflict Detection and Resolution Method** — cs.AI updates on arXiv.org | https://arxiv.org/abs/2509.03550
+- **[Modelos/ALTA] CEHR-GPT: A Scalable Multi-Task Foundation Model for Electronic Health Records** — cs.LG updates on arXiv.org | https://arxiv.org/abs/2509.03643
+- **[Modelos/ALTA] Diffusion-RL Based Air Traffic Conflict Detection and Resolution Method** — cs.AI updates on arXiv.org | https://arxiv.org/abs/2509.03550
+- **[Modelos/ALTA] Enhancing Speech Large Language Models through Reinforced Behavior Alignment** — cs.CL updates on arXiv.org | https://arxiv.org/abs/2509.03526
+- **[Modelos/ALTA] Multilevel Analysis of Cryptocurrency News using RAG Approach with Fine-Tuned Mistral Large Language Model** — cs.CL updates on arXiv.org | https://arxiv.org/abs/2509.03527
+- **[Modelos/ALTA] Multilinear and Linear Programs for Partially Identifiable Queries in Quasi-Markovian Structural Causal Models** — cs.AI updates on arXiv.org | https://arxiv.org/abs/2509.03548
+- **[Modelos/ALTA] Nonnegative matrix factorization and the principle of the common cause** — cs.LG updates on arXiv.org | https://arxiv.org/abs/2509.03652
+- **[Modelos/ALTA] PG-Agent: An Agent Powered by Page Graph** — cs.AI updates on arXiv.org | https://arxiv.org/abs/2509.03536
+- **[Modelos/ALTA] Speech-Based Cognitive Screening: A Systematic Evaluation of LLM Adaptation Strategies** — cs.CL updates on arXiv.org | https://arxiv.org/abs/2509.03525
+- **[Modelos/ALTA] The Optimiser Hidden in Plain Sight: Training with the Loss Landscape's Induced Metric** — cs.LG updates on arXiv.org | https://arxiv.org/abs/2509.03594
 - **[Productos/ALTA] Expanding economic opportunity with AI** — OpenAI News | https://openai.com/index/expanding-economic-opportunity-with-ai
 - **[Productos/ALTA] OpenAI and Greek Government launch ‘OpenAI for Greece’** — OpenAI News | https://openai.com/global-affairs/openai-for-greece
-- **[Investigación/MEDIA] CEHR-GPT: A Scalable Multi-Task Foundation Model for Electronic Health Records** — cs.LG updates on arXiv.org | https://arxiv.org/abs/2509.03643
-- **[Investigación/MEDIA] Enhancing Speech Large Language Models through Reinforced Behavior Alignment** — cs.CL updates on arXiv.org | https://arxiv.org/abs/2509.03526
-- **[Investigación/MEDIA] MCP for Research: How to Connect AI to Research Tools** — Hugging Face - Blog | https://huggingface.co/blog/mcp-for-research
-- **[Investigación/MEDIA] Multilevel Analysis of Cryptocurrency News using RAG Approach with Fine-Tuned Mistral Large Language Model** — cs.CL updates on arXiv.org | https://arxiv.org/abs/2509.03527
-- **[Investigación/MEDIA] Multilinear and Linear Programs for Partially Identifiable Queries in Quasi-Markovian Structural Causal Models** — cs.AI updates on arXiv.org | https://arxiv.org/abs/2509.03548
-- **[Investigación/MEDIA] Nonnegative matrix factorization and the principle of the common cause** — cs.LG updates on arXiv.org | https://arxiv.org/abs/2509.03652
-- **[Investigación/MEDIA] PG-Agent: An Agent Powered by Page Graph** — cs.AI updates on arXiv.org | https://arxiv.org/abs/2509.03536
-- **[Investigación/MEDIA] Speech-Based Cognitive Screening: A Systematic Evaluation of LLM Adaptation Strategies** — cs.CL updates on arXiv.org | https://arxiv.org/abs/2509.03525
-- **[Investigación/MEDIA] The Optimiser Hidden in Plain Sight: Training with the Loss Landscape's Induced Metric** — cs.LG updates on arXiv.org | https://arxiv.org/abs/2509.03594
-- **[Investigación/MEDIA] Why language models hallucinate** — OpenAI News | https://openai.com/index/why-language-models-hallucinate
+- **[Herramientas/MEDIA] MCP for Research: How to Connect AI to Research Tools** — Hugging Face - Blog | https://huggingface.co/blog/mcp-for-research
+- **[Modelos/MEDIA] Why language models hallucinate** — OpenAI News | https://openai.com/index/why-language-models-hallucinate
 - **[Herramientas/BAJA] Generate Images with Claude and Hugging Face** — Hugging Face - Blog | https://huggingface.co/blog/claude-and-mcp
 - **[Modelos/BAJA] Building more helpful ChatGPT experiences for everyone** — OpenAI News | https://openai.com/index/building-more-helpful-chatgpt-experiences-for-everyone
 - **[Modelos/BAJA] GPT-5 bio bug bounty call** — OpenAI News | https://openai.com/gpt-5-bio-bug-bounty
