@@ -1,27 +1,32 @@
-# INTEL Diario – 2025-09-05T05:07:10.927144+00:00
+# INTEL Diario – 2025-09-05T05:20:54.685125+00:00
 
-- **[Oportunidades/BAJA] Expanding economic opportunity with AI** — OpenAI News | https://openai.com/index/expanding-economic-opportunity-with-ai
-- **[Otros/BAJA] Vijaye Raji to become CTO of Applications with acquisition of Statsig** — OpenAI News | https://openai.com/index/vijaye-raji-to-become-cto-of-applications-with-acquisition-of-statsig
-- **[Otros/BAJA] Building more helpful ChatGPT experiences for everyone** — OpenAI News | https://openai.com/index/building-more-helpful-chatgpt-experiences-for-everyone
-- **[Modelos/MEDIA] Introducing gpt-realtime and Realtime API updates** — OpenAI News | https://openai.com/index/introducing-gpt-realtime
-- **[Investigación/MEDIA] Supporting nonprofit and community innovation** — OpenAI News | https://openai.com/index/supporting-nonprofit-and-community-innovation
-- **[Modelos/BAJA] Welcome EmbeddingGemma, Google's new efficient embedding model** — Hugging Face - Blog | https://huggingface.co/blog/embeddinggemma
-- **[Otros/BAJA] Make your ZeroGPU Spaces go brrr with PyTorch ahead-of-time compilation** — Hugging Face - Blog | https://huggingface.co/blog/zerogpu-aoti
-- **[Otros/BAJA] Generate Images with Claude and Hugging Face** — Hugging Face - Blog | https://huggingface.co/blog/claude-and-mcp
-- **[Otros/BAJA] From Zero to GPU: A Guide to Building and Scaling Production-Ready CUDA Kernels** — Hugging Face - Blog | https://huggingface.co/blog/kernel-builder
+- **[Modelos/ALTA] AutoGrid AI: Deep Reinforcement Learning Framework for Autonomous Microgrid Management** — cs.LG updates on arXiv.org | https://arxiv.org/abs/2509.03666
+- **[Modelos/ALTA] CEHR-GPT: A Scalable Multi-Task Foundation Model for Electronic Health Records** — cs.LG updates on arXiv.org | https://arxiv.org/abs/2509.03643
+- **[Modelos/ALTA] CausalARC: Abstract Reasoning with Causal World Models** — cs.AI updates on arXiv.org | https://arxiv.org/abs/2509.03636
+- **[Modelos/ALTA] Diffusion-RL Based Air Traffic Conflict Detection and Resolution Method** — cs.AI updates on arXiv.org | https://arxiv.org/abs/2509.03550
+- **[Modelos/ALTA] Enhancing Speech Large Language Models through Reinforced Behavior Alignment** — cs.CL updates on arXiv.org | https://arxiv.org/abs/2509.03526
+- **[Modelos/ALTA] Explainable Knowledge Graph Retrieval-Augmented Generation (KG-RAG) with KG-SMILE** — cs.AI updates on arXiv.org | https://arxiv.org/abs/2509.03626
+- **[Modelos/ALTA] Introducing gpt-realtime and Realtime API updates** — OpenAI News | https://openai.com/index/introducing-gpt-realtime
+- **[Modelos/ALTA] Learning When to Plan: Efficiently Allocating Test-Time Compute for LLM Agents** — cs.AI updates on arXiv.org | https://arxiv.org/abs/2509.03581
+- **[Modelos/ALTA] Multilevel Analysis of Cryptocurrency News using RAG Approach with Fine-Tuned Mistral Large Language Model** — cs.CL updates on arXiv.org | https://arxiv.org/abs/2509.03527
+- **[Modelos/ALTA] Multilinear and Linear Programs for Partially Identifiable Queries in Quasi-Markovian Structural Causal Models** — cs.AI updates on arXiv.org | https://arxiv.org/abs/2509.03548
+- **[Modelos/ALTA] Multimodal Proposal for an AI-Based Tool to Increase Cross-Assessment of Messages** — cs.CL updates on arXiv.org | https://arxiv.org/abs/2509.03529
+- **[Modelos/ALTA] Nonnegative matrix factorization and the principle of the common cause** — cs.LG updates on arXiv.org | https://arxiv.org/abs/2509.03652
+- **[Modelos/ALTA] PG-Agent: An Agent Powered by Page Graph** — cs.AI updates on arXiv.org | https://arxiv.org/abs/2509.03536
+- **[Modelos/ALTA] Reading Between the Signs: Predicting Future Suicidal Ideation from Adolescent Social Media Texts** — cs.CL updates on arXiv.org | https://arxiv.org/abs/2509.03530
+- **[Modelos/ALTA] Semi-decentralized Federated Time Series Prediction with Client Availability Budgets** — cs.LG updates on arXiv.org | https://arxiv.org/abs/2509.03660
+- **[Modelos/ALTA] SharedRep-RLHF: A Shared Representation Approach to RLHF with Diverse Preferences** — cs.LG updates on arXiv.org | https://arxiv.org/abs/2509.03672
+- **[Modelos/ALTA] Speech-Based Cognitive Screening: A Systematic Evaluation of LLM Adaptation Strategies** — cs.CL updates on arXiv.org | https://arxiv.org/abs/2509.03525
+- **[Modelos/ALTA] The Optimiser Hidden in Plain Sight: Training with the Loss Landscape's Induced Metric** — cs.LG updates on arXiv.org | https://arxiv.org/abs/2509.03594
+- **[Modelos/ALTA] The ProLiFIC dataset: Leveraging LLMs to Unveil the Italian Lawmaking Process** — cs.CL updates on arXiv.org | https://arxiv.org/abs/2509.03528
+- **[Productos/ALTA] Expanding economic opportunity with AI** — OpenAI News | https://openai.com/index/expanding-economic-opportunity-with-ai
+- **[Productos/ALTA] Supporting nonprofit and community innovation** — OpenAI News | https://openai.com/index/supporting-nonprofit-and-community-innovation
 - **[Herramientas/MEDIA] MCP for Research: How to Connect AI to Research Tools** — Hugging Face - Blog | https://huggingface.co/blog/mcp-for-research
-- **[Modelos/MEDIA] PG-Agent: An Agent Powered by Page Graph** — cs.AI updates on arXiv.org | https://arxiv.org/abs/2509.03536
-- **[Productos/BAJA] Multilinear and Linear Programs for Partially Identifiable Queries in Quasi-Markovian Structural Causal Models** — cs.AI updates on arXiv.org | https://arxiv.org/abs/2509.03548
-- **[Modelos/MEDIA] Diffusion-RL Based Air Traffic Conflict Detection and Resolution Method** — cs.AI updates on arXiv.org | https://arxiv.org/abs/2509.03550
-- **[Productos/BAJA] Learning When to Plan: Efficiently Allocating Test-Time Compute for LLM Agents** — cs.AI updates on arXiv.org | https://arxiv.org/abs/2509.03581
-- **[Modelos/BAJA] Explainable Knowledge Graph Retrieval-Augmented Generation (KG-RAG) with KG-SMILE** — cs.AI updates on arXiv.org | https://arxiv.org/abs/2509.03626
-- **[Productos/BAJA] The Optimiser Hidden in Plain Sight: Training with the Loss Landscape's Induced Metric** — cs.LG updates on arXiv.org | https://arxiv.org/abs/2509.03594
-- **[Modelos/MEDIA] CEHR-GPT: A Scalable Multi-Task Foundation Model for Electronic Health Records** — cs.LG updates on arXiv.org | https://arxiv.org/abs/2509.03643
-- **[Modelos/BAJA] Nonnegative matrix factorization and the principle of the common cause** — cs.LG updates on arXiv.org | https://arxiv.org/abs/2509.03652
-- **[Modelos/BAJA] Semi-decentralized Federated Time Series Prediction with Client Availability Budgets** — cs.LG updates on arXiv.org | https://arxiv.org/abs/2509.03660
-- **[Modelos/MEDIA] AutoGrid AI: Deep Reinforcement Learning Framework for Autonomous Microgrid Management** — cs.LG updates on arXiv.org | https://arxiv.org/abs/2509.03666
-- **[Modelos/BAJA] Speech-Based Cognitive Screening: A Systematic Evaluation of LLM Adaptation Strategies** — cs.CL updates on arXiv.org | https://arxiv.org/abs/2509.03525
-- **[Productos/MEDIA] Enhancing Speech Large Language Models through Reinforced Behavior Alignment** — cs.CL updates on arXiv.org | https://arxiv.org/abs/2509.03526
-- **[Modelos/BAJA] Multilevel Analysis of Cryptocurrency News using RAG Approach with Fine-Tuned Mistral Large Language Model** — cs.CL updates on arXiv.org | https://arxiv.org/abs/2509.03527
-- **[Productos/MEDIA] The ProLiFIC dataset: Leveraging LLMs to Unveil the Italian Lawmaking Process** — cs.CL updates on arXiv.org | https://arxiv.org/abs/2509.03528
-- **[Modelos/BAJA] Multimodal Proposal for an AI-Based Tool to Increase Cross-Assessment of Messages** — cs.CL updates on arXiv.org | https://arxiv.org/abs/2509.03529
+- **[Modelos/MEDIA] Collective alignment: public input on our Model Spec** — OpenAI News | https://openai.com/index/collective-alignment-aug-2025-updates
+- **[Herramientas/BAJA] Generate Images with Claude and Hugging Face** — Hugging Face - Blog | https://huggingface.co/blog/claude-and-mcp
+- **[Modelos/BAJA] Building more helpful ChatGPT experiences for everyone** — OpenAI News | https://openai.com/index/building-more-helpful-chatgpt-experiences-for-everyone
+- **[Modelos/BAJA] Welcome EmbeddingGemma, Google's new efficient embedding model** — Hugging Face - Blog | https://huggingface.co/blog/embeddinggemma
+- **[Otros/BAJA] From Zero to GPU: A Guide to Building and Scaling Production-Ready CUDA Kernels** — Hugging Face - Blog | https://huggingface.co/blog/kernel-builder
+- **[Otros/BAJA] Make your ZeroGPU Spaces go brrr with PyTorch ahead-of-time compilation** — Hugging Face - Blog | https://huggingface.co/blog/zerogpu-aoti
+- **[Otros/BAJA] TextQuests: How Good are LLMs at Text-Based Video Games?** — Hugging Face - Blog | https://huggingface.co/blog/textquests
+- **[Productos/BAJA] Vijaye Raji to become CTO of Applications with acquisition of Statsig** — OpenAI News | https://openai.com/index/vijaye-raji-to-become-cto-of-applications-with-acquisition-of-statsig
