@@ -1,4 +1,4 @@
-# INTEL Diario – 2025-09-05T23:14:21.994262+00:00
+# INTEL Diario – 2025-09-05T23:23:44.475738+00:00
 
 - **[Investigación/ALTA] Diffusion-RL Based Air Traffic Conflict Detection and Resolution Method** — cs.AI updates on arXiv.org | https://arxiv.org/abs/2509.03550
 - **[Productos/ALTA] Expanding economic opportunity with AI** — OpenAI News | https://openai.com/index/expanding-economic-opportunity-with-ai
