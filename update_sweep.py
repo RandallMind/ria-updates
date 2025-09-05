@@ -53,6 +53,7 @@ def url_text(link: str) -> str:
         return ""
 
 def pick_summary(e) -> str:
+    # Intenta summary/description; si no, usa content[0]
     for key in ("summary", "description"):
         v = getattr(e, key, None)
         if v:
@@ -62,7 +63,7 @@ def pick_summary(e) -> str:
         try:
             if isinstance(c[0], dict) and "value" in c[0]:
                 return c[0]["value"]
-            return c[0].value  # type: ignore[attr-defined]
+            return c[0].value  # FeedParserDict soporta acceso por atributo
         except Exception:
             pass
     return ""
@@ -76,9 +77,13 @@ def classify(text: str, link: str = ""):
 # --------- Recolección ----------
 items = []
 for url in SOURCES:
-    feed = feedparser.parse(url)
-    src = getattr(getattr(feed, "feed", {}), "title", url)
-    for e in feed.entries[:6]:
+    try:
+        feed = feedparser.parse(url)
+    except Exception:
+        continue
+    src = getattr(getattr(feed, "feed", {}), "title", "") or urlparse(url).netloc
+    entries = getattr(feed, "entries", []) or []
+    for e in entries[:6]:
         title = norm(getattr(e, "title", ""))
         link  = norm(getattr(e, "link", ""))
         if not link.startswith("http"):
