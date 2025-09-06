@@ -1,6 +1,8 @@
-import feedparser, json, hashlib, re
+import feedparser, json, hashlib, re, os
 from datetime import datetime, timezone
 from urllib.parse import urlparse, unquote
+
+SCRIPT_VERSION = "2025-09-05-hard-clamp-v4"
 
 # --------- Fuentes ----------
 SOURCES = [
@@ -20,11 +22,11 @@ SOURCES = [
 ]
 
 DEFAULT_LIMIT = 6
-ARXIV_LIMIT   = 3
+ARXIV_LIMIT   = 2  # Recomendación experta: 2 para bajar ruido de papers
 
 # --------- Reglas de clasificación ----------
-# INVESTIGACIÓN primero para que matchee antes que "Modelos"
 CAT_RULES = [
+  # INVESTIGACIÓN primero (papers/arXiv)
   ("Investigación", r"\b(arxiv|paper|research|benchmark|state[- ]of[- ]the[- ]art|sota|investigaci[oó]n)\b"),
   ("Modelos", r"\b(model|gpt|llama|mistral|gemma|embedding|diffusion|clip|transformer)\w*\b"),
   ("Productos", r"\b(launch|releas|introduc|announc|plataforma|app|feature|availability|presenta|lanza|anuncia)\w*\b"),
@@ -33,7 +35,7 @@ CAT_RULES = [
   ("Oportunidades", r"\b(grant|program|jobs|certification|partner|beta|funding|convocatoria|beca|certificaci[oó]n)\w*\b"),
 ]
 
-# Señales fuertes para ALTA (incluye “GA” abreviado)
+# (Solo aplica a NO-arXiv; arXiv será forzado a MEDIA)
 ALTA_STRONG_RX = r"\b(launch\w*|releas\w*|introduc\w*|announc\w*|anunci\w*|lanza\w*|general availability|(?<![a-z])ga(?![a-z])|deprecat\w*|sunset\w*|retirad\w*|end[- ]of[- ]life|eol|price|pricing|cost|billing|security|breach\w*|leak\w*|vulnerab\w*|cve-\d{4}-\d+|patch|zero[- ]day|incident\w*|eu ai act|gdpr|licen\w*|policy|terms)\b"
 
 PRIORITY_RULES = [
@@ -51,7 +53,6 @@ def norm(x: str) -> str:
     return re.sub(r"\s+", " ", x).strip()
 
 def url_text(link: str) -> str:
-    """Host + path para detectar 'introducing', 'launch', etc."""
     try:
         p = urlparse(link)
         return unquote((p.netloc + " " + p.path).replace("-", " "))
@@ -78,20 +79,11 @@ def classify(text: str):
     pr  = next((p for p, rx in PRIORITY_RULES if re.search(rx, t)), "BAJA")
     return cat, pr
 
-# --- Detección robusta de arXiv (host, fuente y texto tipo 'arXiv:2509…') ---
+# Detección robusta de arXiv (host, fuente, o texto "arXiv:2509…")
 _ARXIV_TAG_RX = re.compile(r"\barxiv\s*:\s*\d", re.IGNORECASE)
 def is_arxiv(link: str, source: str, text: str) -> bool:
     host = urlparse(link).netloc.lower()
     return ("arxiv.org" in host) or ("arxiv" in (source or "").lower()) or bool(_ARXIV_TAG_RX.search(text or ""))
-
-def adjust_for_source(title: str, summary: str, link: str, source: str, cat: str, pr: str):
-    """arXiv => Investigación + MEDIA salvo señales fuertes."""
-    text = f"{title} {summary} {url_text(link)}"
-    if is_arxiv(link, source, text):
-        cat = "Investigación"
-        if not re.search(ALTA_STRONG_RX, text, flags=re.IGNORECASE):
-            pr = "MEDIA"
-    return cat, pr
 
 # --------- Recolección ----------
 items = []
@@ -110,7 +102,19 @@ for url in SOURCES:
         base_text = f"{title} {summ} {url_text(link)}"
 
         cat, pr = classify(base_text)
-        cat, pr = adjust_for_source(title, summ, link, src, cat, pr)
+
+        # HARD CLAMP arXiv: SIEMPRE Investigación/MEDIA
+        arxiv_hit = is_arxiv(link, src, base_text)
+        if arxiv_hit:
+            cat, pr = "Investigación", "MEDIA"
+        else:
+            # Reaplica prioridad solo para no-arXiv
+            if re.search(ALTA_STRONG_RX, base_text, flags=re.IGNORECASE):
+                pr = "ALTA"
+            elif re.search(r"\b(update\w*|beta|preview|roll[- ]?out|api|sdk|agent|research|paper|benchmark)\b", base_text, flags=re.IGNORECASE):
+                pr = "MEDIA"
+            else:
+                pr = "BAJA"
 
         items.append({
             "source": norm(src),
@@ -120,7 +124,8 @@ for url in SOURCES:
             "category": cat,
             "priority": pr,
             "impact": "",
-            "risks": ""
+            "risks": "",
+            "flags": {"is_arxiv": bool(arxiv_hit)}
         })
 
 # De-dup por link/título
@@ -128,24 +133,27 @@ seen, clean = set(), []
 for it in items:
     key = it["link"] or it["title"].lower()
     h = hashlib.md5(key.encode("utf-8")).hexdigest()
-    if h in seen: 
+    if h in seen:
         continue
     seen.add(h)
     clean.append(it)
 
-# --------- Saneamiento final (doble candado) ----------
+# Saneamiento final (doble candado arXiv)
 for it in clean:
-    text_full = f"{it['title']} {it['summary']} {url_text(it['link'])}"
-    if is_arxiv(it["link"], it["source"], text_full):
+    if it.get("flags", {}).get("is_arxiv"):
         it["category"] = "Investigación"
-        if not re.search(ALTA_STRONG_RX, text_full, flags=re.IGNORECASE):
-            it["priority"] = "MEDIA"
+        it["priority"] = "MEDIA"
 
 # Orden por prioridad y alfabético
 clean.sort(key=lambda it: (PRIORITY_ORDER.get(it["priority"], 9), it["category"], it["title"]))
 
 payload = {
   "generated_at": datetime.now(timezone.utc).isoformat(),
+  "meta": {
+    "script_version": SCRIPT_VERSION,
+    "arxiv_limit": ARXIV_LIMIT,
+    "hard_clamp_arxiv": True
+  },
   "items": clean[:50]
 }
 
@@ -155,5 +163,7 @@ with open("updates.json","w",encoding="utf-8") as f:
 
 with open("updates.md","w",encoding="utf-8") as f:
     f.write(f"# INTEL Diario – {payload['generated_at']}\n\n")
+    f.write(f"_Script: {SCRIPT_VERSION} · arXiv_limit={ARXIV_LIMIT} · hard_clamp_arxiv=True_\n\n")
     for it in payload["items"]:
         f.write(f"- **[{it['category']}/{it['priority']}] {it['title']}** — {it['source']} | {it['link']}\n")
+  
