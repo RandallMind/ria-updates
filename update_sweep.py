@@ -1,13 +1,27 @@
-# update_sweep.py — v6 (Top-5, dedupe mejorado, clamp arXiv, fallback API, telemetría)
-import feedparser, json, hashlib, re, os, time
+#!/usr/bin/env python3
+# sweep.py — 2025-09-06-hard-clamp-final
+# Recolecta feeds, clasifica, deduplica, y aplica hard clamp para arXiv.
+# Requisitos: feedparser (pip install feedparser)
+
+import feedparser
+import json
+import hashlib
+import re
+import sys
 from datetime import datetime, timezone
 from urllib.parse import urlparse, unquote
+from difflib import SequenceMatcher
 
-SCRIPT_VERSION = "2025-09-06-hard-clamp-v6"
-HTTP_AGENT     = "RIA-IntelBot/1.0 (+https://randallmind.github.io/ria-updates) Python-feedparser"
-HTTP_RETRIES   = 2  # reintentos ligeros
+# ----------------- CONFIG -----------------
+SCRIPT_VERSION = "2025-09-06-hard-clamp-final"
+ARXIV_LIMIT = 2              # límite global para items desde arXiv
+HARD_CLAMP_ARXIV = True      # si True fuerza que solo ARXIV_LIMIT arxiv items queden en salida
+MAX_PER_SOURCE = 6           # máximo por fuente tomada del feed (salvo arXiv limitado por ARXIV_LIMIT)
+MAX_ITEMS = 50               # máximo total de ítems en output
+FUZZY_DEDUP_THRESHOLD = 0.86 # similaridad > esto -> considerar duplicado
+HTTP_AGENT = "RIA-IntelBot/1.0 (+https://randallmind.github.io/ria-updates) Python-feedparser"
 
-# --------- Fuentes ----------
+# Fuentes (editar/activar ES-LATAM si conviene)
 SOURCES = [
   "https://openai.com/blog/rss.xml",
   "https://ai.googleblog.com/atom.xml",
@@ -19,43 +33,41 @@ SOURCES = [
   "https://arxiv.org/rss/cs.AI",
   "https://arxiv.org/rss/cs.LG",
   "https://arxiv.org/rss/cs.CL",
-  # --- ES / LATAM (activa quitando el "#") ---
   # "https://www.xataka.com/tag/inteligencia-artificial/rss2.xml",
   # "https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/tecnologia/ia/portada",
 ]
 
-DEFAULT_LIMIT = 6
-ARXIV_LIMIT   = 2  # señal máxima con mínimo ruido (recomendación experta)
-
-# --------- Clasificación ----------
+# Reglas de clasificación (EN + ES básicos)
 CAT_RULES = [
-  ("Investigación", r"\b(arxiv|paper|research|benchmark|state[- ]of[- ]the[- ]art|sota|investigaci[oó]n)\b"),
-  ("Modelos", r"\b(model|gpt|llama|mistral|gemma|embedding|diffusion|clip|transformer)\w*\b"),
-  ("Productos", r"\b(launch|releas|introduc|announc|plataforma|app|feature|availability|presenta|lanza|anuncia)\w*\b"),
-  ("Herramientas", r"\b(sdk|api|tool|agent|workflow|automation|rpa|plugin|mcp)\w*\b"),
+  ("Modelos", r"\b(model|gpt|llama|mistral|gemma|embedding|diffusion|clip|transformer|foundation|llm)\w*\b"),
+  ("Productos", r"\b(launch|release|introduc|announce|annunci|lanza|plataforma|app|feature|availability|presenta)\w*\b"),
+  ("Herramientas", r"\b(sdk|api|tool|agent|workflow|automation|rpa|plugin|mcp|library)\w*\b"),
+  ("Investigación", r"\b(arxiv|paper|research|benchmark|state[- ]of[- ]the[- ]art|sota|investigaci[oó]n|study|method)\w*\b"),
   ("Compliance/Regulación", r"\b(eu ai act|gdpr|compliance|regulation|policy|licen|copyright|privacy|regulaci[oó]n)\w*\b"),
-  ("Oportunidades", r"\b(grant|program|jobs|certification|partner|beta|funding|convocatoria|beca|certificaci[oó]n)\w*\b"),
+  ("Oportunidades", r"\b(grant|program|jobs|certification|partner|beta|funding|beca|convocatoria)\w*\b"),
 ]
-
-ALTA_STRONG_RX = r"\b(launch\w*|releas\w*|introduc\w*|announc\w*|anunci\w*|lanza\w*|general availability|(?<![a-z])ga(?![a-z])|deprecat\w*|sunset\w*|retirad\w*|end[- ]of[- ]life|eol|price|pricing|cost|billing|security|breach\w*|leak\w*|vulnerab\w*|cve-\d{4}-\d+|patch|zero[- ]day|incident\w*|eu ai act|gdpr|licen\w*|policy|terms)\b"
 
 PRIORITY_RULES = [
-  ("ALTA",  ALTA_STRONG_RX),
-  ("MEDIA", r"\b(update\w*|beta|preview|roll[- ]?out|research|paper|arxiv|benchmark|api|sdk|agent)\b"),
-  ("BAJA",  r".*"),
+  ("ALTA", r"\b(launch\w*|releas\w*|introduc\w*|announc\w*|anunci\w*|lanza\w*|general availability|deprecat\w*|sunset|end[- ]of[- ]life|price|pricing|security|breach|vulnerab\w*|cve-\d{4}-\d+|patch|incident)\b"),
+  ("MEDIA", r"\b(update\w*|beta|preview|research|paper|arxiv|benchmark|api|sdk|agent|study)\b"),
+  ("BAJA", r".*"),
 ]
+
 PRIORITY_ORDER = {"ALTA": 0, "MEDIA": 1, "BAJA": 2}
 
-CATEGORY_ORDER = [
-  "Productos", "Compliance/Regulación", "Herramientas",
-  "Modelos", "Investigación", "Oportunidades", "Otros"
+# Palabras para filtrar/denoise (configurable)
+DENY_KEYWORDS = [
+    # temas usualmente ruido para un feed ejecutivo o muy técnico irrelevante
+    r"\b(dataset\b|code\b|supplementary\b|appendix\b|workshop\b|workshops?\b|poster\b)\b",
 ]
-CATEGORY_SCORE = {c:i for i,c in enumerate(CATEGORY_ORDER)}
+# Palabras que bajan prioridad (si aparecen en título/resumen)
+DEPRIORITIZE_KEYWORDS = [
+    r"\b(virtual try-on|video generation|text-based video games|game)\b"
+]
 
-# --------- Utilidades ----------
+# --------------- UTILIDADES ----------------
 def norm(x: str) -> str:
-    if not x: return ""
-    return re.sub(r"\s+", " ", x).strip()
+    return re.sub(r"\s+", " ", x or "").strip()
 
 def url_text(link: str) -> str:
     try:
@@ -64,236 +76,195 @@ def url_text(link: str) -> str:
     except Exception:
         return ""
 
-def pick_summary(e) -> str:
+def pick_summary(e):
     for key in ("summary", "description"):
         v = getattr(e, key, None)
-        if v: return v
+        if v:
+            return norm(v)
     c = getattr(e, "content", None)
     if c:
         try:
-            if isinstance(c[0], dict) and "value" in c[0]:
-                return c[0]["value"]
-            return c[0].value  # type: ignore
+            if isinstance(c, list) and isinstance(c[0], dict) and "value" in c[0]:
+                return norm(c[0]["value"])
+            return norm(c[0].value)  # type: ignore[attr-defined]
         except Exception:
             pass
     return ""
 
-def classify(text: str):
-    t = text.lower()
+def fuzzy_sim(a: str, b: str) -> float:
+    return SequenceMatcher(None, (a or "").lower(), (b or "").lower()).ratio()
+
+def matches_any(text: str, patterns):
+    for p in patterns:
+        if re.search(p, text, flags=re.I):
+            return True
+    return False
+
+def classify(text: str, link: str = ""):
+    t = (text + " " + url_text(link)).lower()
     cat = next((c for c, rx in CAT_RULES if re.search(rx, t)), "Otros")
     pr  = next((p for p, rx in PRIORITY_RULES if re.search(rx, t)), "BAJA")
+    # deprioritize heuristics
+    if matches_any(t, DEPRIORITIZE_KEYWORDS) and pr == "ALTA":
+        pr = "MEDIA"
     return cat, pr
 
-_ARXIV_TAG_RX = re.compile(r"\barxiv\s*:\s*\d", re.IGNORECASE)
-def is_arxiv(link: str, source: str, text: str) -> bool:
-    host = urlparse(link).netloc.lower()
-    return ("arxiv.org" in host) or ("arxiv" in (source or "").lower()) or bool(_ARXIV_TAG_RX.search(text or ""))
-
-# --- Fallback API de arXiv (ATOM) si RSS viene vacío ---
-def arxiv_api_from_rss_url(url: str) -> str | None:
+def is_arxiv_link(link: str) -> bool:
     try:
-        p = urlparse(url)
-        if "arxiv.org" not in p.netloc or not p.path.startswith("/rss/"):
-            return None
-        cat = p.path.split("/rss/")[1].strip("/")
-        if not cat: return None
-        mr = max(ARXIV_LIMIT, 2)
-        return f"http://export.arxiv.org/api/query?search_query=cat:{cat}&start=0&max_results={mr}&sortBy=submittedDate&sortOrder=descending"
+        return "arxiv.org" in urlparse(link).netloc.lower()
     except Exception:
-        return None
+        return False
 
-def parse_with_retries(url: str):
-    last_err = ""
-    for _ in range(HTTP_RETRIES + 1):
-        try:
-            feed = feedparser.parse(url, agent=HTTP_AGENT)
-            return feed, ""
-        except Exception as e:
-            last_err = f"{type(e).__name__}: {e}"
-            time.sleep(1.0)
-    return None, last_err
-
-# --------- Recolección ----------
+# ------------- RECOLECCIÓN -----------------
 items = []
-stats = {}  # telemetría por fuente
+sources_stats = {}
 
-for url in SOURCES:
-    per_feed_limit = ARXIV_LIMIT if "arxiv.org" in url else DEFAULT_LIMIT
-    feed, err = parse_with_retries(url)
-    src_title = url
-    entries = []
-    used_fallback = False
+for src_url in SOURCES:
+    try:
+        feed = feedparser.parse(src_url, agent=HTTP_AGENT)
+        title = getattr(getattr(feed, "feed", {}), "title", src_url)
+        entries = list(getattr(feed, "entries", []))
+        # choose per-source limit
+        per_source_limit = MAX_PER_SOURCE
+        if "arxiv.org" in src_url:
+            per_source_limit = max(1, ARXIV_LIMIT)  # take at most ARXIV_LIMIT per arXiv feed segment
+        used_count = 0
+        for e in entries[:per_source_limit]:
+            title_e = norm(getattr(e, "title", ""))
+            link_e  = norm(getattr(e, "link", ""))
+            if not link_e.startswith("http"):
+                continue
+            summ = pick_summary(e)
+            combined_text = f"{title_e} {summ}"
+            # deny-filters
+            if matches_any(combined_text, DENY_KEYWORDS):
+                continue
+            cat, pr = classify(combined_text, link_e)
+            items.append({
+                "source": norm(title),
+                "title": title_e,
+                "link": link_e,
+                "summary": summ,
+                "category": cat,
+                "priority": pr,
+                "impact": "",
+                "risks": "",
+                "flags": {
+                    "is_arxiv": is_arxiv_link(link_e)
+                },
+                "published": getattr(e, "published", "") or getattr(e, "updated", "")
+            })
+            used_count += 1
+        sources_stats[src_url] = {
+            "source_title": norm(title),
+            "count": used_count,
+            "used_fallback": getattr(feed, "bozo", False),
+            "error": getattr(feed, "bozo_exception", "")
+        }
+    except Exception as ex:
+        sources_stats[src_url] = {"source_title": src_url, "count": 0, "used_fallback": False, "error": str(ex)}
 
-    if feed:
-        src_title = getattr(getattr(feed, "feed", {}), "title", "") or url
-        entries = getattr(feed, "entries", []) or []
+# -------------- DEDUP (link + fuzzy title) --------------
+clean = []
+seen_links = set()
+titles = []
 
-    # Fallback: si es arXiv y no hay entries, usa export API
-    if (not entries) and ("arxiv.org" in url):
-        fb = arxiv_api_from_rss_url(url)
-        if fb:
-            fb_feed, fb_err = parse_with_retries(fb)
-            if fb_feed:
-                fb_title = getattr(getattr(fb_feed, "feed", {}), "title", "") or src_title
-                src_title = f"{src_title} (fallback API)"
-                entries = getattr(fb_feed, "entries", []) or []
-                used_fallback = True
-                err = ""
-            else:
-                err = err or fb_err
-
-    stats[url] = {
-        "source_title": src_title,
-        "count": len(entries[:per_feed_limit]),
-        "used_fallback": used_fallback,
-        "error": err
-    }
-
-    for e in entries[:per_feed_limit]:
-        title = norm(getattr(e, "title", ""))
-        link  = norm(getattr(e, "link", ""))
-        if not link.startswith("http"):
-            continue
-        summ  = norm(pick_summary(e))
-        base_text = f"{title} {summ} {url_text(link)}"
-        cat, pr = classify(base_text)
-
-        # HARD CLAMP arXiv: SIEMPRE Investigación/MEDIA
-        arxiv_hit = is_arxiv(link, src_title, base_text)
-        if arxiv_hit:
-            cat, pr = "Investigación", "MEDIA"
-        else:
-            if re.search(ALTA_STRONG_RX, base_text, flags=re.IGNORECASE):
-                pr = "ALTA"
-            elif re.search(r"\b(update\w*|beta|preview|roll[- ]?out|api|sdk|agent|research|paper|benchmark)\b",
-                           base_text, flags=re.IGNORECASE):
-                pr = "MEDIA"
-            else:
-                pr = "BAJA"
-
-        items.append({
-            "source": norm(src_title),
-            "title": title,
-            "link": link,
-            "summary": summ,
-            "category": cat,
-            "priority": pr,
-            "impact": "",
-            "risks": "",
-            "flags": {"is_arxiv": bool(arxiv_hit)}
-        })
-
-# --------- De-dup 1: por link/título exacto ----------
-seen, clean = set(), []
 for it in items:
     key = it["link"] or it["title"].lower()
     h = hashlib.md5(key.encode("utf-8")).hexdigest()
-    if h in seen:
+    if h in seen_links:
         continue
-    seen.add(h)
+    # fuzzy compare with existing titles
+    duplicate = False
+    for t in titles:
+        if fuzzy_sim(t, it["title"]) > FUZZY_DEDUP_THRESHOLD:
+            duplicate = True
+            break
+    if duplicate:
+        continue
+    seen_links.add(h)
+    titles.append(it["title"])
     clean.append(it)
 
-# --------- De-dup 2: similitud de títulos (Jaccard tokens) ----------
-STOPWORDS = set("a an the and or of on en de la el los las un una para por con y del al".split())
-def title_tokens(t: str) -> set[str]:
-    t = re.sub(r"[^a-zA-Z0-9áéíóúñÁÉÍÓÚÑ ]+", " ", t.lower())
-    toks = [w for w in t.split() if w not in STOPWORDS and len(w) > 2]
-    return set(toks)
+# -------------- ARXIV HARD-CLAMP & PRIORITIZACION --------------
+# Extraemos arxiv items, ordenamos por priority+published recency y limitamos
+arxiv_items = [c for c in clean if c.get("flags", {}).get("is_arxiv")]
+non_arxiv_items = [c for c in clean if not c.get("flags", {}).get("is_arxiv")]
 
-def jaccard(a: set[str], b: set[str]) -> float:
-    if not a or not b: return 0.0
-    inter = len(a & b); union = len(a | b)
-    return inter / union if union else 0.0
+def sort_key(it):
+    pr_ord = PRIORITY_ORDER.get(it.get("priority","BAJA"), 9)
+    # try to use published timestamp for recency if available (fallback 0)
+    try:
+        dt = it.get("published","")
+        # no strict parsing: use string as fallback, sort lexicographically reversed (newer first)
+        return (pr_ord, 0 if not dt else -1)
+    except Exception:
+        return (pr_ord, 0)
 
-dedup2 = []
-for it in clean:
-    tset = title_tokens(it["title"])
-    dup = False
-    for jt in dedup2:
-        # solo consideramos duplicado si (misma categoría o misma prioridad) y títulos muy similares
-        if (it["category"] == jt["category"]) or (it["priority"] == jt["priority"]):
-            if jaccard(tset, title_tokens(jt["title"])) >= 0.82:
-                dup = True
-                break
-    if not dup:
-        dedup2.append(it)
-clean = dedup2
+# keep arxiv items limited
+if HARD_CLAMP_ARXIV:
+    # sort arxiv by priority then keep top ARXIV_LIMIT
+    arxiv_items_sorted = sorted(arxiv_items, key=lambda it: (PRIORITY_ORDER.get(it.get("priority","BAJA"),9), it.get("title","")))
+    arxiv_items_kept = arxiv_items_sorted[:max(0, ARXIV_LIMIT)]
+else:
+    arxiv_items_kept = arxiv_items
 
-# --------- Saneamiento final (doble candado arXiv) ----------
-for it in clean:
-    if it.get("flags", {}).get("is_arxiv"):
-        it["category"] = "Investigación"
-        it["priority"] = "MEDIA"
+# Combine back, then sort globally by priority + category + title and clamp to MAX_ITEMS
+combined = non_arxiv_items + arxiv_items_kept
+combined.sort(key=lambda it: (PRIORITY_ORDER.get(it.get("priority","BAJA"), 9), it.get("category",""), it.get("title","")))
 
-# --------- Orden principal ----------
-clean.sort(key=lambda it: (
-    PRIORITY_ORDER.get(it["priority"], 9),
-    CATEGORY_SCORE.get(it["category"], 99),
-    0 if not it.get("flags", {}).get("is_arxiv") else 1,
-    it["title"]
-))
+payload_items = combined[:MAX_ITEMS]
 
-# --------- Top-5 ejecutivo ----------
-def choose_top5(items):
-    top = []
-    def pick(filter_fn, limit=None):
-        nonlocal top
-        for it in items:
-            if it in top: continue
-            if filter_fn(it):
-                top.append(it)
-                if limit and len(top) >= limit: break
+# enrich impact/risks heuristics simple
+for it in payload_items:
+    t = (it.get("title","") + " " + it.get("summary","")).lower()
+    if re.search(r"\b(security|breach|vulnerab|cve-|privacy|exploit)\b", t):
+        it["risks"] = "Alto — evaluar impacto de seguridad"
+    if it.get("priority") == "ALTA":
+        it["impact"] = "Relevante — evaluar acción/monitoreo"
 
-    # 1) ALTA no arXiv
-    pick(lambda it: it["priority"]=="ALTA" and not it["flags"].get("is_arxiv"))
-    # 2) MEDIA no arXiv (ordenado por categoría preferente)
-    if len(top) < 5:
-        pick(lambda it: it["priority"]=="MEDIA" and not it["flags"].get("is_arxiv"))
-    # 3) MEDIA arXiv (para completar si hiciera falta)
-    if len(top) < 5:
-        pick(lambda it: it["priority"]=="MEDIA" and it["flags"].get("is_arxiv"))
-    # 4) Resto
-    if len(top) < 5:
-        pick(lambda it: True)
-
-    return top[:5]
-
-top5 = choose_top5(clean)
-
-payload = {
-  "generated_at": datetime.now(timezone.utc).isoformat(),
-  "meta": {
+# --------------- METADATA Y TOP5 ----------------
+meta = {
     "script_version": SCRIPT_VERSION,
     "arxiv_limit": ARXIV_LIMIT,
-    "hard_clamp_arxiv": True,
+    "hard_clamp_arxiv": HARD_CLAMP_ARXIV,
     "http_agent": HTTP_AGENT,
-    "sources_stats": {},  # se rellena debajo
-    "top5_count": len(top5)
-  },
-  "items": clean[:50],
-  "top5": [
-      {
-        "source": it["source"], "title": it["title"], "link": it["link"],
-        "category": it["category"], "priority": it["priority"],
-        "is_arxiv": it["flags"].get("is_arxiv", False)
-      } for it in top5
-  ]
+    "sources_stats": sources_stats,
+    "top5_count": min(5, len(payload_items))
 }
-payload["meta"]["sources_stats"] = {k:v for k,v in stats.items()}
 
-# --------- Salida ----------
-with open("updates.json","w",encoding="utf-8") as f:
-  json.dump(payload, f, ensure_ascii=False, indent=2)
+# compute top5 (simple slice of ordered payload)
+top5 = []
+for it in payload_items[:5]:
+    top5.append({
+        "source": it["source"],
+        "title": it["title"],
+        "link": it["link"],
+        "category": it["category"],
+        "priority": it["priority"],
+        "is_arxiv": it.get("flags", {}).get("is_arxiv", False)
+    })
 
-with open("updates.md","w",encoding="utf-8") as f:
-  f.write(f"# INTEL Diario – {payload['generated_at']}\n\n")
-  f.write(f"_Script: {SCRIPT_VERSION} · arXiv_limit={ARXIV_LIMIT} · hard_clamp_arXiv=True_\n\n")
-  # Top 5 ejecutivo
-  f.write("## Top 5 ejecutivo\n\n")
-  for it in payload["top5"]:
-      f.write(f"- **[{it['category']}/{it['priority']}] {it['title']}** — {it['source']} | {it['link']}\n")
-  f.write("\n---\n\n")
-  # Resto de novedades
-  f.write("## Resto de novedades\n\n")
-  for it in payload["items"]:
-      f.write(f"- **[{it['category']}/{it['priority']}] {it['title']}** — {it['source']} | {it['link']}\n")
+out = {
+    "generated_at": datetime.now(timezone.utc).isoformat(),
+    "meta": meta,
+    "items": payload_items,
+    "top5": top5
+}
+
+# --------------- SALIDA A ARCHIVOS ----------------
+with open("updates.json", "w", encoding="utf-8") as f:
+    json.dump(out, f, ensure_ascii=False, indent=2)
+
+with open("updates.md", "w", encoding="utf-8") as f:
+    f.write(f"# INTEL Diario – {out['generated_at']}\n\n")
+    for it in out["items"]:
+        f.write(f"- **[{it['category']}/{it['priority']}] {it['title']}** — {it['source']} | {it['link']}\n")
+
+# --------------- LOG POR CONSOLA ----------------
+print("Wrote updates.json and updates.md")
+print("script_version:", SCRIPT_VERSION)
+print("total_collected:", len(items), "deduped:", len(clean), "final:", len(payload_items))
+print("arxiv kept:", sum(1 for i in payload_items if i.get("flags",{}).get("is_arxiv")))
+# exit cleanly
+sys.exit(0)
