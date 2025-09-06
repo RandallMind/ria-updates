@@ -1,9 +1,72 @@
 {
-  "generated_at": "2025-09-06T04:46:31.445634+00:00",
+  "generated_at": "2025-09-06T04:53:23.298472+00:00",
   "meta": {
-    "script_version": "2025-09-05-hard-clamp-v4",
+    "script_version": "2025-09-06-hard-clamp-v5",
     "arxiv_limit": 2,
-    "hard_clamp_arxiv": true
+    "hard_clamp_arxiv": true,
+    "http_agent": "RIA-IntelBot/1.0 (+https://randallmind.github.io/ria-updates) Python-feedparser",
+    "sources_stats": {
+      "https://openai.com/blog/rss.xml": {
+        "source_title": "OpenAI News",
+        "count": 6,
+        "used_fallback": false,
+        "error": ""
+      },
+      "https://ai.googleblog.com/atom.xml": {
+        "source_title": "https://ai.googleblog.com/atom.xml",
+        "count": 0,
+        "used_fallback": false,
+        "error": ""
+      },
+      "https://azure.microsoft.com/en-us/updates/feed/": {
+        "source_title": "https://azure.microsoft.com/en-us/updates/feed/",
+        "count": 0,
+        "used_fallback": false,
+        "error": ""
+      },
+      "https://about.fb.com/news/tag/ai/feed/": {
+        "source_title": "https://about.fb.com/news/tag/ai/feed/",
+        "count": 0,
+        "used_fallback": false,
+        "error": ""
+      },
+      "https://www.anthropic.com/news.xml": {
+        "source_title": "https://www.anthropic.com/news.xml",
+        "count": 0,
+        "used_fallback": false,
+        "error": ""
+      },
+      "https://mistral.ai/news/feed.xml": {
+        "source_title": "https://mistral.ai/news/feed.xml",
+        "count": 0,
+        "used_fallback": false,
+        "error": ""
+      },
+      "https://huggingface.co/blog/feed.xml": {
+        "source_title": "Hugging Face - Blog",
+        "count": 6,
+        "used_fallback": false,
+        "error": ""
+      },
+      "https://arxiv.org/rss/cs.AI": {
+        "source_title": "cs.AI updates on arXiv.org (fallback API)",
+        "count": 2,
+        "used_fallback": true,
+        "error": ""
+      },
+      "https://arxiv.org/rss/cs.LG": {
+        "source_title": "cs.LG updates on arXiv.org (fallback API)",
+        "count": 2,
+        "used_fallback": true,
+        "error": ""
+      },
+      "https://arxiv.org/rss/cs.CL": {
+        "source_title": "cs.CL updates on arXiv.org (fallback API)",
+        "count": 2,
+        "used_fallback": true,
+        "error": ""
+      }
+    }
   },
   "items": [
     {
@@ -33,6 +96,45 @@
       }
     },
     {
+      "source": "cs.CL updates on arXiv.org (fallback API)",
+      "title": "ArcMemo: Abstract Reasoning Composition with Lifelong LLM Memory",
+      "link": "http://arxiv.org/abs/2509.04439v1",
+      "summary": "While inference-time scaling enables LLMs to carry out increasingly long and capable reasoning traces, the patterns and insights uncovered during these traces are immediately discarded once the context window is reset for a new query. External memory is a natural way to persist these discoveries, and recent work has shown clear benefits for reasoning-intensive tasks. We see an opportunity to make such memories more broadly reusable and scalable by moving beyond instance-based memory entries (e.g. exact query/response pairs, or summaries tightly coupled with the original problem context) toward concept-level memory: reusable, modular abstractions distilled from solution traces and stored in natural language. For future queries, relevant concepts are selectively retrieved and integrated into the prompt, enabling test-time continual learning without weight updates. Our design introduces new strategies for abstracting takeaways from rollouts and retrieving entries for new queries, promoting reuse and allowing memory to expand with additional experiences. On the challenging ARC-AGI benchmark, our method yields a 7.5% relative gain over a strong no-memory baseline with performance continuing to scale with inference compute. We find abstract concepts to be the most consistent memory design, outscoring the baseline at all tested inference compute scales. Moreover, we confirm that dynamically updating memory during test-time outperforms an otherwise identical fixed memory setting with additional attempts, supporting the hypothesis that solving more problems and abstracting more patterns to memory enables further solutions in a form of self-improvement. Code available at https://github.com/matt-seb-ho/arc_memo.",
+      "category": "Investigación",
+      "priority": "MEDIA",
+      "impact": "",
+      "risks": "",
+      "flags": {
+        "is_arxiv": true
+      }
+    },
+    {
+      "source": "cs.AI updates on arXiv.org (fallback API)",
+      "title": "ChronoGraph: A Real-World Graph-Based Multivariate Time Series Dataset",
+      "link": "http://arxiv.org/abs/2509.04449v1",
+      "summary": "We present ChronoGraph, a graph-structured multivariate time series forecasting dataset built from real-world production microservices. Each node is a service that emits a multivariate stream of system-level performance metrics, capturing CPU, memory, and network usage patterns, while directed edges encode dependencies between services. The primary task is forecasting future values of these signals at the service level. In addition, ChronoGraph provides expert-annotated incident windows as anomaly labels, enabling evaluation of anomaly detection methods and assessment of forecast robustness during operational disruptions. Compared to existing benchmarks from industrial control systems or traffic and air-quality domains, ChronoGraph uniquely combines (i) multivariate time series, (ii) an explicit, machine-readable dependency graph, and (iii) anomaly labels aligned with real incidents. We report baseline results spanning forecasting models, pretrained time-series foundation models, and standard anomaly detectors. ChronoGraph offers a realistic benchmark for studying structure-aware forecasting and incident-aware evaluation in microservice systems.",
+      "category": "Investigación",
+      "priority": "MEDIA",
+      "impact": "",
+      "risks": "",
+      "flags": {
+        "is_arxiv": true
+      }
+    },
+    {
+      "source": "cs.AI updates on arXiv.org (fallback API)",
+      "title": "Delta Activations: A Representation for Finetuned Large Language Models",
+      "link": "http://arxiv.org/abs/2509.04442v1",
+      "summary": "The success of powerful open source Large Language Models (LLMs) has enabled the community to create a vast collection of post-trained models adapted to specific tasks and domains. However, navigating and understanding these models remains challenging due to inconsistent metadata and unstructured repositories. We introduce Delta Activations, a method to represent finetuned models as vector embeddings by measuring shifts in their internal activations relative to a base model. This representation allows for effective clustering by domain and task, revealing structure in the model landscape. Delta Activations also demonstrate desirable properties: it is robust across finetuning settings and exhibits an additive property when finetuning datasets are mixed. In addition, we show that Delta Activations can embed tasks via few-shot finetuning, and further explore its use for model selection and merging. We hope Delta Activations can facilitate the practice of reusing publicly available models. Code is available at https://github.com/OscarXZQ/delta_activations.",
+      "category": "Investigación",
+      "priority": "MEDIA",
+      "impact": "",
+      "risks": "",
+      "flags": {
+        "is_arxiv": true
+      }
+    },
+    {
       "source": "Hugging Face - Blog",
       "title": "MCP for Research: How to Connect AI to Research Tools",
       "link": "https://huggingface.co/blog/mcp-for-research",
@@ -43,6 +145,19 @@
       "risks": "",
       "flags": {
         "is_arxiv": false
+      }
+    },
+    {
+      "source": "cs.LG updates on arXiv.org (fallback API)",
+      "title": "Virtual Fitting Room: Generating Arbitrarily Long Videos of Virtual Try-On from a Single Image -- Technical Preview",
+      "link": "http://arxiv.org/abs/2509.04450v1",
+      "summary": "We introduce the Virtual Fitting Room (VFR), a novel video generative model that produces arbitrarily long virtual try-on videos. Our VFR models long video generation tasks as an auto-regressive, segment-by-segment generation process, eliminating the need for resource-intensive generation and lengthy video data, while providing the flexibility to generate videos of arbitrary length. The key challenges of this task are twofold: ensuring local smoothness between adjacent segments and maintaining global temporal consistency across different segments. To address these challenges, we propose our VFR framework, which ensures smoothness through a prefix video condition and enforces consistency with the anchor video -- a 360-degree video that comprehensively captures the human's wholebody appearance. Our VFR generates minute-scale virtual try-on videos with both local smoothness and global temporal consistency under various motions, making it a pioneering work in long virtual try-on video generation.",
+      "category": "Investigación",
+      "priority": "MEDIA",
+      "impact": "",
+      "risks": "",
+      "flags": {
+        "is_arxiv": true
       }
     },
     {
