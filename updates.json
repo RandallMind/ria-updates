@@ -1,7 +1,7 @@
 {
-  "generated_at": "2025-09-06T04:53:23.298472+00:00",
+  "generated_at": "2025-09-06T12:42:23.912162+00:00",
   "meta": {
-    "script_version": "2025-09-06-hard-clamp-v5",
+    "script_version": "2025-09-06-hard-clamp-v6",
     "arxiv_limit": 2,
     "hard_clamp_arxiv": true,
     "http_agent": "RIA-IntelBot/1.0 (+https://randallmind.github.io/ria-updates) Python-feedparser",
@@ -66,7 +66,8 @@
         "used_fallback": true,
         "error": ""
       }
-    }
+    },
+    "top5_count": 5
   },
   "items": [
     {
@@ -89,6 +90,32 @@
       "summary": "OpenAI and the Greek Government have launched “OpenAI for Greece” to bring ChatGPT Edu into secondary schools and support responsible AI learning. This partnership aims to boost AI literacy, fuel local start-ups, and drive national economic growth.",
       "category": "Productos",
       "priority": "ALTA",
+      "impact": "",
+      "risks": "",
+      "flags": {
+        "is_arxiv": false
+      }
+    },
+    {
+      "source": "Hugging Face - Blog",
+      "title": "MCP for Research: How to Connect AI to Research Tools",
+      "link": "https://huggingface.co/blog/mcp-for-research",
+      "summary": "",
+      "category": "Investigación",
+      "priority": "MEDIA",
+      "impact": "",
+      "risks": "",
+      "flags": {
+        "is_arxiv": false
+      }
+    },
+    {
+      "source": "OpenAI News",
+      "title": "Why language models hallucinate",
+      "link": "https://openai.com/index/why-language-models-hallucinate",
+      "summary": "OpenAI’s new research explains why language models hallucinate. The findings show how improved evaluations can enhance AI reliability, honesty, and safety.",
+      "category": "Investigación",
+      "priority": "MEDIA",
       "impact": "",
       "risks": "",
       "flags": {
@@ -135,19 +162,6 @@
       }
     },
     {
-      "source": "Hugging Face - Blog",
-      "title": "MCP for Research: How to Connect AI to Research Tools",
-      "link": "https://huggingface.co/blog/mcp-for-research",
-      "summary": "",
-      "category": "Investigación",
-      "priority": "MEDIA",
-      "impact": "",
-      "risks": "",
-      "flags": {
-        "is_arxiv": false
-      }
-    },
-    {
       "source": "cs.LG updates on arXiv.org (fallback API)",
       "title": "Virtual Fitting Room: Generating Arbitrarily Long Videos of Virtual Try-On from a Single Image -- Technical Preview",
       "link": "http://arxiv.org/abs/2509.04450v1",
@@ -162,11 +176,11 @@
     },
     {
       "source": "OpenAI News",
-      "title": "Why language models hallucinate",
-      "link": "https://openai.com/index/why-language-models-hallucinate",
-      "summary": "OpenAI’s new research explains why language models hallucinate. The findings show how improved evaluations can enhance AI reliability, honesty, and safety.",
-      "category": "Investigación",
-      "priority": "MEDIA",
+      "title": "Vijaye Raji to become CTO of Applications with acquisition of Statsig",
+      "link": "https://openai.com/index/vijaye-raji-to-become-cto-of-applications-with-acquisition-of-statsig",
+      "summary": "Vijaye Raji will step into a new role as CTO of Applications, reporting to CEO of Applications, Fidji Simo, following the acquisition of Statsig.",
+      "category": "Productos",
+      "priority": "BAJA",
       "impact": "",
       "risks": "",
       "flags": {
@@ -263,19 +277,48 @@
       "flags": {
         "is_arxiv": false
       }
+    }
+  ],
+  "top5": [
+    {
+      "source": "OpenAI News",
+      "title": "Expanding economic opportunity with AI",
+      "link": "https://openai.com/index/expanding-economic-opportunity-with-ai",
+      "category": "Productos",
+      "priority": "ALTA",
+      "is_arxiv": false
     },
     {
       "source": "OpenAI News",
-      "title": "Vijaye Raji to become CTO of Applications with acquisition of Statsig",
-      "link": "https://openai.com/index/vijaye-raji-to-become-cto-of-applications-with-acquisition-of-statsig",
-      "summary": "Vijaye Raji will step into a new role as CTO of Applications, reporting to CEO of Applications, Fidji Simo, following the acquisition of Statsig.",
+      "title": "OpenAI and Greek Government launch ‘OpenAI for Greece’",
+      "link": "https://openai.com/global-affairs/openai-for-greece",
       "category": "Productos",
-      "priority": "BAJA",
-      "impact": "",
-      "risks": "",
-      "flags": {
-        "is_arxiv": false
-      }
+      "priority": "ALTA",
+      "is_arxiv": false
+    },
+    {
+      "source": "Hugging Face - Blog",
+      "title": "MCP for Research: How to Connect AI to Research Tools",
+      "link": "https://huggingface.co/blog/mcp-for-research",
+      "category": "Investigación",
+      "priority": "MEDIA",
+      "is_arxiv": false
+    },
+    {
+      "source": "OpenAI News",
+      "title": "Why language models hallucinate",
+      "link": "https://openai.com/index/why-language-models-hallucinate",
+      "category": "Investigación",
+      "priority": "MEDIA",
+      "is_arxiv": false
+    },
+    {
+      "source": "cs.CL updates on arXiv.org (fallback API)",
+      "title": "ArcMemo: Abstract Reasoning Composition with Lifelong LLM Memory",
+      "link": "http://arxiv.org/abs/2509.04439v1",
+      "category": "Investigación",
+      "priority": "MEDIA",
+      "is_arxiv": true
     }
   ]
 }
