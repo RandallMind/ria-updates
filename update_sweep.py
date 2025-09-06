@@ -166,4 +166,3 @@ with open("updates.md","w",encoding="utf-8") as f:
     f.write(f"_Script: {SCRIPT_VERSION} · arXiv_limit={ARXIV_LIMIT} · hard_clamp_arxiv=True_\n\n")
     for it in payload["items"]:
         f.write(f"- **[{it['category']}/{it['priority']}] {it['title']}** — {it['source']} | {it['link']}\n")
-  
