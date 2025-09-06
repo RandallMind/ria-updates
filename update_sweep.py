@@ -1,270 +1,279 @@
 #!/usr/bin/env python3
-# sweep.py — 2025-09-06-hard-clamp-final
-# Recolecta feeds, clasifica, deduplica, y aplica hard clamp para arXiv.
-# Requisitos: feedparser (pip install feedparser)
+# -*- coding: utf-8 -*-
+"""
+sweep.py
+Recolecta feeds RSS/Atom, aplica 'hard clamp' para arXiv, dedupe,
+crea updates.json y updates.md.
+
+Requisitos:
+    pip install requests feedparser
+
+Uso:
+    - Edita ARXIV_LIMIT abajo (2 o 3).
+    - Ejecuta: python sweep.py
+"""
+
+from datetime import datetime, timezone
+import hashlib
+import json
+import logging
+import os
+import sys
+import time
+from typing import Dict, List
 
 import feedparser
-import json
-import hashlib
-import re
-import sys
-from datetime import datetime, timezone
-from urllib.parse import urlparse, unquote
-from difflib import SequenceMatcher
+import requests
 
-# ----------------- CONFIG -----------------
-SCRIPT_VERSION = "2025-09-06-hard-clamp-final"
-ARXIV_LIMIT = 2              # límite global para items desde arXiv
-HARD_CLAMP_ARXIV = True      # si True fuerza que solo ARXIV_LIMIT arxiv items queden en salida
-MAX_PER_SOURCE = 6           # máximo por fuente tomada del feed (salvo arXiv limitado por ARXIV_LIMIT)
-MAX_ITEMS = 50               # máximo total de ítems en output
-FUZZY_DEDUP_THRESHOLD = 0.86 # similaridad > esto -> considerar duplicado
+# ------------------------------
+# CONFIG / AJUSTABLES
+# ------------------------------
+ARXIV_LIMIT = 2               # <- pon 2 o 3 según prefieras ("espectacular 2" o "espectacular 3")
+HARD_CLAMP_ARXIV = True       # si True, limitamos por fuente de arXiv
+SCRIPT_VERSION = "2025-09-06-hard-clamp-v7"
+
+# Agente HTTP (identificar tu bot / proyecto)
 HTTP_AGENT = "RIA-IntelBot/1.0 (+https://randallmind.github.io/ria-updates) Python-feedparser"
 
-# Fuentes (editar/activar ES-LATAM si conviene)
+# Timeout en segundos para requests
+HTTP_TIMEOUT = 15
+
+# Salidas
+OUT_JSON = "updates.json"
+OUT_MD = "updates.md"
+
+# Prioridad orden (ALTA primero)
+PRIORITY_ORDER = {"ALTA": 0, "MEDIA": 1, "BAJA": 2, "": 3}
+
+# Mapeo simple de "categoría" por fuente (se puede ajustar)
+SOURCE_TITLE_OVERRIDES = {
+    "https://openai.com/blog/rss.xml": "OpenAI News",
+    "https://huggingface.co/blog/feed.xml": "Hugging Face - Blog",
+    "https://arxiv.org/rss/cs.AI": "cs.AI updates on arXiv.org (fallback API)",
+    "https://arxiv.org/rss/cs.LG": "cs.LG updates on arXiv.org (fallback API)",
+    "https://arxiv.org/rss/cs.CL": "cs.CL updates on arXiv.org (fallback API)",
+}
+
+# Fuentes (puedes modificar/añadir)
 SOURCES = [
-  "https://openai.com/blog/rss.xml",
-  "https://ai.googleblog.com/atom.xml",
-  "https://azure.microsoft.com/en-us/updates/feed/",
-  "https://about.fb.com/news/tag/ai/feed/",
-  "https://www.anthropic.com/news.xml",
-  "https://mistral.ai/news/feed.xml",
-  "https://huggingface.co/blog/feed.xml",
-  "https://arxiv.org/rss/cs.AI",
-  "https://arxiv.org/rss/cs.LG",
-  "https://arxiv.org/rss/cs.CL",
-  # "https://www.xataka.com/tag/inteligencia-artificial/rss2.xml",
-  # "https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/tecnologia/ia/portada",
+    "https://openai.com/blog/rss.xml",
+    "https://huggingface.co/blog/feed.xml",
+    "https://arxiv.org/rss/cs.AI",
+    "https://arxiv.org/rss/cs.LG",
+    "https://arxiv.org/rss/cs.CL",
+    # puedes añadir más feeds aquí
 ]
 
-# Reglas de clasificación (EN + ES básicos)
-CAT_RULES = [
-  ("Modelos", r"\b(model|gpt|llama|mistral|gemma|embedding|diffusion|clip|transformer|foundation|llm)\w*\b"),
-  ("Productos", r"\b(launch|release|introduc|announce|annunci|lanza|plataforma|app|feature|availability|presenta)\w*\b"),
-  ("Herramientas", r"\b(sdk|api|tool|agent|workflow|automation|rpa|plugin|mcp|library)\w*\b"),
-  ("Investigación", r"\b(arxiv|paper|research|benchmark|state[- ]of[- ]the[- ]art|sota|investigaci[oó]n|study|method)\w*\b"),
-  ("Compliance/Regulación", r"\b(eu ai act|gdpr|compliance|regulation|policy|licen|copyright|privacy|regulaci[oó]n)\w*\b"),
-  ("Oportunidades", r"\b(grant|program|jobs|certification|partner|beta|funding|beca|convocatoria)\w*\b"),
-]
+# ------------------------------
+# LOGGING
+# ------------------------------
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(message)s",
+    handlers=[logging.StreamHandler(sys.stdout)],
+)
+logger = logging.getLogger("sweep")
 
-PRIORITY_RULES = [
-  ("ALTA", r"\b(launch\w*|releas\w*|introduc\w*|announc\w*|anunci\w*|lanza\w*|general availability|deprecat\w*|sunset|end[- ]of[- ]life|price|pricing|security|breach|vulnerab\w*|cve-\d{4}-\d+|patch|incident)\b"),
-  ("MEDIA", r"\b(update\w*|beta|preview|research|paper|arxiv|benchmark|api|sdk|agent|study)\b"),
-  ("BAJA", r".*"),
-]
-
-PRIORITY_ORDER = {"ALTA": 0, "MEDIA": 1, "BAJA": 2}
-
-# Palabras para filtrar/denoise (configurable)
-DENY_KEYWORDS = [
-    # temas usualmente ruido para un feed ejecutivo o muy técnico irrelevante
-    r"\b(dataset\b|code\b|supplementary\b|appendix\b|workshop\b|workshops?\b|poster\b)\b",
-]
-# Palabras que bajan prioridad (si aparecen en título/resumen)
-DEPRIORITIZE_KEYWORDS = [
-    r"\b(virtual try-on|video generation|text-based video games|game)\b"
-]
-
-# --------------- UTILIDADES ----------------
-def norm(x: str) -> str:
-    return re.sub(r"\s+", " ", x or "").strip()
-
-def url_text(link: str) -> str:
+# ------------------------------
+# HELPERS
+# ------------------------------
+def safe_request(url: str, headers: Dict = None, timeout: int = HTTP_TIMEOUT):
+    headers = headers or {}
+    headers.setdefault("User-Agent", HTTP_AGENT)
     try:
-        p = urlparse(link)
-        return unquote((p.netloc + " " + p.path).replace("-", " "))
-    except Exception:
-        return ""
+        r = requests.get(url, headers=headers, timeout=timeout)
+        r.raise_for_status()
+        return r
+    except Exception as e:
+        raise
 
-def pick_summary(e):
-    for key in ("summary", "description"):
-        v = getattr(e, key, None)
-        if v:
-            return norm(v)
-    c = getattr(e, "content", None)
-    if c:
-        try:
-            if isinstance(c, list) and isinstance(c[0], dict) and "value" in c[0]:
-                return norm(c[0]["value"])
-            return norm(c[0].value)  # type: ignore[attr-defined]
-        except Exception:
-            pass
-    return ""
+def md5_of(s: str) -> str:
+    return hashlib.md5(s.encode("utf-8")).hexdigest()
 
-def fuzzy_sim(a: str, b: str) -> float:
-    return SequenceMatcher(None, (a or "").lower(), (b or "").lower()).ratio()
+def is_arxiv_source(url: str) -> bool:
+    return "arxiv.org" in url or url.startswith("http://arxiv.org") or url.startswith("https://arxiv.org")
 
-def matches_any(text: str, patterns):
-    for p in patterns:
-        if re.search(p, text, flags=re.I):
-            return True
-    return False
+def normalize_entry(entry) -> Dict:
+    """
+    Normaliza los campos que esperamos de feedparser.entry
+    """
+    title = getattr(entry, "title", "") or ""
+    link = getattr(entry, "link", "") or ""
+    summary = getattr(entry, "summary", "") or getattr(entry, "description", "") or ""
+    # published fallback
+    published = getattr(entry, "published", "") or getattr(entry, "updated", "")
+    return {"title": title.strip(), "link": link.strip(), "summary": summary.strip(), "published": published}
 
-def classify(text: str, link: str = ""):
-    t = (text + " " + url_text(link)).lower()
-    cat = next((c for c, rx in CAT_RULES if re.search(rx, t)), "Otros")
-    pr  = next((p for p, rx in PRIORITY_RULES if re.search(rx, t)), "BAJA")
-    # deprioritize heuristics
-    if matches_any(t, DEPRIORITIZE_KEYWORDS) and pr == "ALTA":
-        pr = "MEDIA"
-    return cat, pr
-
-def is_arxiv_link(link: str) -> bool:
+# ------------------------------
+# CORE
+# ------------------------------
+def fetch_feed(url: str) -> List[Dict]:
+    """
+    Baja y parsea un feed. Devuelve lista de entradas normalizadas.
+    """
+    logger.debug(f"Fetching feed: {url}")
     try:
-        return "arxiv.org" in urlparse(link).netloc.lower()
-    except Exception:
-        return False
+        # fetch with requests to control headers
+        resp = safe_request(url)
+        content = resp.content
+        parsed = feedparser.parse(content)
+        if parsed.bozo and parsed.bozo_exception:
+            logger.warning(f"feedparser reported bozo for {url}: {parsed.bozo_exception}")
+        entries = parsed.entries or []
+        results = [normalize_entry(e) for e in entries]
+        return results, ""
+    except Exception as e:
+        logger.error(f"Error fetching/parsing {url}: {e}")
+        return [], str(e)
 
-# ------------- RECOLECCIÓN -----------------
-items = []
-sources_stats = {}
+def main():
+    start_ts = datetime.now(timezone.utc).isoformat()
+    items = []
+    sources_stats = {}
+    seen_hashes = set()
+    arxiv_counts_per_feed = {}
 
-for src_url in SOURCES:
-    try:
-        feed = feedparser.parse(src_url, agent=HTTP_AGENT)
-        title = getattr(getattr(feed, "feed", {}), "title", src_url)
-        entries = list(getattr(feed, "entries", []))
-        # choose per-source limit
-        per_source_limit = MAX_PER_SOURCE
-        if "arxiv.org" in src_url:
-            per_source_limit = max(1, ARXIV_LIMIT)  # take at most ARXIV_LIMIT per arXiv feed segment
-        used_count = 0
-        for e in entries[:per_source_limit]:
-            title_e = norm(getattr(e, "title", ""))
-            link_e  = norm(getattr(e, "link", ""))
-            if not link_e.startswith("http"):
+    for src in SOURCES:
+        entries, error = fetch_feed(src)
+        source_title = SOURCE_TITLE_OVERRIDES.get(src, src)
+        count = 0
+        used_fallback = False  # en tu flujo original tenías fallback api; aquí lo marcamos solo si error
+        if error:
+            sources_stats[src] = {"source_title": source_title, "count": 0, "used_fallback": False, "error": error}
+            continue
+
+        for ent in entries:
+            # Si es arXiv y aplicamos hard clamp, limitamos cuantos items por feed
+            if is_arxiv_source(src) and HARD_CLAMP_ARXIV:
+                cnt = arxiv_counts_per_feed.get(src, 0)
+                if cnt >= ARXIV_LIMIT:
+                    continue  # omitimos restantes de ese feed
+                arxiv_counts_per_feed[src] = cnt + 1
+
+            normalized = ent
+            # Simple dedupe por link+title
+            h = md5_of((normalized["link"] + "|" + normalized["title"]).strip().lower())
+            if h in seen_hashes:
                 continue
-            summ = pick_summary(e)
-            combined_text = f"{title_e} {summ}"
-            # deny-filters
-            if matches_any(combined_text, DENY_KEYWORDS):
-                continue
-            cat, pr = classify(combined_text, link_e)
-            items.append({
-                "source": norm(title),
-                "title": title_e,
-                "link": link_e,
-                "summary": summ,
-                "category": cat,
-                "priority": pr,
+            seen_hashes.add(h)
+
+            # Clasificación básica (puedes mejorar reglas)
+            category = "Otros"
+            title_l = normalized["title"].lower()
+            if "arxiv" in normalized["link"] or is_arxiv_source(src):
+                category = "Investigación"
+            elif "openai" in src or "openai" in normalized["link"]:
+                category = "Productos"
+            elif "huggingface" in src:
+                category = "Herramientas"
+            elif "kernel" in title_l or "cuda" in title_l or "gpu" in title_l:
+                category = "Otros"
+
+            # Prioridad heurística (puedes ajustar)
+            priority = ""
+            # si es investigación arXiv -> ALTA por default (pero puedes ajustar)
+            if category == "Investigación":
+                priority = "ALTA"
+            elif category == "Productos":
+                priority = "ALTA"
+            elif category == "Herramientas":
+                priority = "MEDIA"
+            else:
+                priority = "BAJA"
+
+            item = {
+                "source": source_title,
+                "title": normalized["title"],
+                "link": normalized["link"],
+                "summary": normalized["summary"],
+                "category": category,
+                "priority": priority,
                 "impact": "",
                 "risks": "",
-                "flags": {
-                    "is_arxiv": is_arxiv_link(link_e)
-                },
-                "published": getattr(e, "published", "") or getattr(e, "updated", "")
-            })
-            used_count += 1
-        sources_stats[src_url] = {
-            "source_title": norm(title),
-            "count": used_count,
-            "used_fallback": getattr(feed, "bozo", False),
-            "error": getattr(feed, "bozo_exception", "")
-        }
-    except Exception as ex:
-        sources_stats[src_url] = {"source_title": src_url, "count": 0, "used_fallback": False, "error": str(ex)}
+                "flags": {"is_arxiv": is_arxiv_source(src) or "arxiv.org" in normalized["link"]},
+            }
+            items.append(item)
+            count += 1
 
-# -------------- DEDUP (link + fuzzy title) --------------
-clean = []
-seen_links = set()
-titles = []
+        sources_stats[src] = {"source_title": source_title, "count": count, "used_fallback": used_fallback, "error": ""}
 
-for it in items:
-    key = it["link"] or it["title"].lower()
-    h = hashlib.md5(key.encode("utf-8")).hexdigest()
-    if h in seen_links:
-        continue
-    # fuzzy compare with existing titles
-    duplicate = False
-    for t in titles:
-        if fuzzy_sim(t, it["title"]) > FUZZY_DEDUP_THRESHOLD:
-            duplicate = True
+    # Ordenar items por prioridad y luego por título (estabilidad)
+    def sort_key(it):
+        p = it.get("priority", "")
+        return (PRIORITY_ORDER.get(p, 99), it.get("title", ""))
+
+    items.sort(key=sort_key)
+
+    # Información meta
+    meta = {
+        "script_version": SCRIPT_VERSION,
+        "arxiv_limit": ARXIV_LIMIT,
+        "hard_clamp_arxiv": HARD_CLAMP_ARXIV,
+        "http_agent": HTTP_AGENT,
+        "sources_stats": sources_stats,
+        "generated_at": start_ts,
+        "top5_count": 5,
+    }
+
+    # Top5: toma los primeros N preservando orden ya ordenado por prioridad
+    top5 = []
+    for it in items:
+        top5.append({
+            "source": it["source"],
+            "title": it["title"],
+            "link": it["link"],
+            "category": it["category"],
+            "priority": it["priority"],
+            "is_arxiv": it["flags"].get("is_arxiv", False)
+        })
+        if len(top5) >= meta["top5_count"]:
             break
-    if duplicate:
-        continue
-    seen_links.add(h)
-    titles.append(it["title"])
-    clean.append(it)
 
-# -------------- ARXIV HARD-CLAMP & PRIORITIZACION --------------
-# Extraemos arxiv items, ordenamos por priority+published recency y limitamos
-arxiv_items = [c for c in clean if c.get("flags", {}).get("is_arxiv")]
-non_arxiv_items = [c for c in clean if not c.get("flags", {}).get("is_arxiv")]
+    payload = {"generated_at": start_ts, "meta": meta, "items": items, "top5": top5}
 
-def sort_key(it):
-    pr_ord = PRIORITY_ORDER.get(it.get("priority","BAJA"), 9)
-    # try to use published timestamp for recency if available (fallback 0)
+    # Escribir JSON (ensure_ascii=False para mantener acentos)
     try:
-        dt = it.get("published","")
-        # no strict parsing: use string as fallback, sort lexicographically reversed (newer first)
-        return (pr_ord, 0 if not dt else -1)
-    except Exception:
-        return (pr_ord, 0)
+        with open(OUT_JSON, "w", encoding="utf-8") as f:
+            json.dump(payload, f, ensure_ascii=False, indent=2)
+        logger.info(f"Wrote {OUT_JSON} (items: {len(items)})")
+    except Exception as e:
+        logger.error(f"Error writing {OUT_JSON}: {e}")
 
-# keep arxiv items limited
-if HARD_CLAMP_ARXIV:
-    # sort arxiv by priority then keep top ARXIV_LIMIT
-    arxiv_items_sorted = sorted(arxiv_items, key=lambda it: (PRIORITY_ORDER.get(it.get("priority","BAJA"),9), it.get("title","")))
-    arxiv_items_kept = arxiv_items_sorted[:max(0, ARXIV_LIMIT)]
-else:
-    arxiv_items_kept = arxiv_items
+    # Escribir Markdown resumen (updates.md)
+    try:
+        with open(OUT_MD, "w", encoding="utf-8") as mf:
+            mf.write(f"# INTEL Diario - {start_ts}\n\n")
+            mf.write("## Top 5\n\n")
+            for idx, t in enumerate(top5, start=1):
+                is_arx = " (arXiv)" if t.get("is_arxiv") else ""
+                mf.write(f"{idx}. **{t['title']}** - _{t['source']}_ - {t['category']} - {t['priority']}{is_arx}\n")
+                mf.write(f"   {t['link']}\n\n")
+            mf.write("---\n\n")
+            mf.write("## Items completos\n\n")
+            for it in items:
+                is_arx = " (arXiv)" if it["flags"].get("is_arxiv") else ""
+                mf.write(f"### {it['title']}{is_arx}\n")
+                mf.write(f"- Source: {it['source']}\n")
+                mf.write(f"- Category: {it['category']}\n")
+                mf.write(f"- Priority: {it['priority']}\n")
+                mf.write(f"- Link: {it['link']}\n\n")
+                if it["summary"]:
+                    # keep it short in md
+                    s = it["summary"].replace("\n", " ").strip()
+                    if len(s) > 1000:
+                        s = s[:1000] + "..."
+                    mf.write(f"> {s}\n\n")
+            mf.write("\n")
+        logger.info(f"Wrote {OUT_MD}")
+    except Exception as e:
+        logger.error(f"Error writing {OUT_MD}: {e}")
 
-# Combine back, then sort globally by priority + category + title and clamp to MAX_ITEMS
-combined = non_arxiv_items + arxiv_items_kept
-combined.sort(key=lambda it: (PRIORITY_ORDER.get(it.get("priority","BAJA"), 9), it.get("category",""), it.get("title","")))
+    # Print a short status to stdout
+    logger.info("Summary:")
+    logger.info(f"  total items: {len(items)}")
+    logger.info(f"  top5: {len(top5)}")
+    for src, st in sources_stats.items():
+        logger.info(f"  {src} -> count={st['count']} error={bool(st['error'])}")
 
-payload_items = combined[:MAX_ITEMS]
-
-# enrich impact/risks heuristics simple
-for it in payload_items:
-    t = (it.get("title","") + " " + it.get("summary","")).lower()
-    if re.search(r"\b(security|breach|vulnerab|cve-|privacy|exploit)\b", t):
-        it["risks"] = "Alto — evaluar impacto de seguridad"
-    if it.get("priority") == "ALTA":
-        it["impact"] = "Relevante — evaluar acción/monitoreo"
-
-# --------------- METADATA Y TOP5 ----------------
-meta = {
-    "script_version": SCRIPT_VERSION,
-    "arxiv_limit": ARXIV_LIMIT,
-    "hard_clamp_arxiv": HARD_CLAMP_ARXIV,
-    "http_agent": HTTP_AGENT,
-    "sources_stats": sources_stats,
-    "top5_count": min(5, len(payload_items))
-}
-
-# compute top5 (simple slice of ordered payload)
-top5 = []
-for it in payload_items[:5]:
-    top5.append({
-        "source": it["source"],
-        "title": it["title"],
-        "link": it["link"],
-        "category": it["category"],
-        "priority": it["priority"],
-        "is_arxiv": it.get("flags", {}).get("is_arxiv", False)
-    })
-
-out = {
-    "generated_at": datetime.now(timezone.utc).isoformat(),
-    "meta": meta,
-    "items": payload_items,
-    "top5": top5
-}
-
-# --------------- SALIDA A ARCHIVOS ----------------
-with open("updates.json", "w", encoding="utf-8") as f:
-    json.dump(out, f, ensure_ascii=False, indent=2)
-
-with open("updates.md", "w", encoding="utf-8") as f:
-    f.write(f"# INTEL Diario – {out['generated_at']}\n\n")
-    for it in out["items"]:
-        f.write(f"- **[{it['category']}/{it['priority']}] {it['title']}** — {it['source']} | {it['link']}\n")
-
-# --------------- LOG POR CONSOLA ----------------
-print("Wrote updates.json and updates.md")
-print("script_version:", SCRIPT_VERSION)
-print("total_collected:", len(items), "deduped:", len(clean), "final:", len(payload_items))
-print("arxiv kept:", sum(1 for i in payload_items if i.get("flags",{}).get("is_arxiv")))
-# exit cleanly
-sys.exit(0)
+if __name__ == "__main__":
+    main()
