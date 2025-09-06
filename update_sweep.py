@@ -1,8 +1,11 @@
-import feedparser, json, hashlib, re, os
+import feedparser, json, hashlib, re, os, time
 from datetime import datetime, timezone
 from urllib.parse import urlparse, unquote
 
-SCRIPT_VERSION = "2025-09-05-hard-clamp-v4"
+SCRIPT_VERSION = "2025-09-06-hard-clamp-v5"
+HTTP_AGENT     = "RIA-IntelBot/1.0 (+https://randallmind.github.io/ria-updates) Python-feedparser"
+HTTP_TIMEOUT_S = 20
+HTTP_RETRIES   = 2  # reintentos ligeros
 
 # --------- Fuentes ----------
 SOURCES = [
@@ -22,11 +25,10 @@ SOURCES = [
 ]
 
 DEFAULT_LIMIT = 6
-ARXIV_LIMIT   = 2  # Recomendación experta: 2 para bajar ruido de papers
+ARXIV_LIMIT   = 2  # Recomendación experta: 2 para máximo signal/noise
 
 # --------- Reglas de clasificación ----------
 CAT_RULES = [
-  # INVESTIGACIÓN primero (papers/arXiv)
   ("Investigación", r"\b(arxiv|paper|research|benchmark|state[- ]of[- ]the[- ]art|sota|investigaci[oó]n)\b"),
   ("Modelos", r"\b(model|gpt|llama|mistral|gemma|embedding|diffusion|clip|transformer)\w*\b"),
   ("Productos", r"\b(launch|releas|introduc|announc|plataforma|app|feature|availability|presenta|lanza|anuncia)\w*\b"),
@@ -35,7 +37,6 @@ CAT_RULES = [
   ("Oportunidades", r"\b(grant|program|jobs|certification|partner|beta|funding|convocatoria|beca|certificaci[oó]n)\w*\b"),
 ]
 
-# (Solo aplica a NO-arXiv; arXiv será forzado a MEDIA)
 ALTA_STRONG_RX = r"\b(launch\w*|releas\w*|introduc\w*|announc\w*|anunci\w*|lanza\w*|general availability|(?<![a-z])ga(?![a-z])|deprecat\w*|sunset\w*|retirad\w*|end[- ]of[- ]life|eol|price|pricing|cost|billing|security|breach\w*|leak\w*|vulnerab\w*|cve-\d{4}-\d+|patch|zero[- ]day|incident\w*|eu ai act|gdpr|licen\w*|policy|terms)\b"
 
 PRIORITY_RULES = [
@@ -48,8 +49,7 @@ PRIORITY_ORDER = {"ALTA": 0, "MEDIA": 1, "BAJA": 2}
 
 # --------- Utilidades ----------
 def norm(x: str) -> str:
-    if not x:
-        return ""
+    if not x: return ""
     return re.sub(r"\s+", " ", x).strip()
 
 def url_text(link: str) -> str:
@@ -79,19 +79,75 @@ def classify(text: str):
     pr  = next((p for p, rx in PRIORITY_RULES if re.search(rx, t)), "BAJA")
     return cat, pr
 
-# Detección robusta de arXiv (host, fuente, o texto "arXiv:2509…")
 _ARXIV_TAG_RX = re.compile(r"\barxiv\s*:\s*\d", re.IGNORECASE)
 def is_arxiv(link: str, source: str, text: str) -> bool:
     host = urlparse(link).netloc.lower()
     return ("arxiv.org" in host) or ("arxiv" in (source or "").lower()) or bool(_ARXIV_TAG_RX.search(text or ""))
 
+# --- Fallback API de arXiv (ATOM) si RSS viene vacío ---
+def arxiv_api_from_rss_url(url: str) -> str | None:
+    # esperan formato: https://arxiv.org/rss/<CAT>  -> cat:<CAT>
+    try:
+        p = urlparse(url)
+        if "arxiv.org" not in p.netloc or not p.path.startswith("/rss/"):
+            return None
+        cat = p.path.split("/rss/")[1].strip("/")
+        if not cat: return None
+        # usar export API (máx resultados = ARXIV_LIMIT + 1 por seguridad)
+        mr = max(ARXIV_LIMIT, 2)
+        return f"http://export.arxiv.org/api/query?search_query=cat:{cat}&start=0&max_results={mr}&sortBy=submittedDate&sortOrder=descending"
+    except Exception:
+        return None
+
+def parse_with_retries(url: str):
+    last_err = ""
+    for i in range(HTTP_RETRIES + 1):
+        try:
+            feed = feedparser.parse(url, agent=HTTP_AGENT)
+            # feedparser no tiene timeout directo en todas las versiones; si tu runner lo soporta, puedes:
+            # feed = feedparser.parse(url, agent=HTTP_AGENT, timeout=HTTP_TIMEOUT_S)
+            return feed, ""
+        except Exception as e:
+            last_err = f"{type(e).__name__}: {e}"
+            time.sleep(1.0)
+    return None, last_err
+
 # --------- Recolección ----------
 items = []
+stats = {}  # telemetría por fuente
+
 for url in SOURCES:
-    feed = feedparser.parse(url)
-    src = getattr(getattr(feed, "feed", {}), "title", "") or url
-    entries = getattr(feed, "entries", []) or []
     per_feed_limit = ARXIV_LIMIT if "arxiv.org" in url else DEFAULT_LIMIT
+
+    feed, err = parse_with_retries(url)
+    src_title = url
+    entries = []
+    used_fallback = False
+
+    if feed:
+        src_title = getattr(getattr(feed, "feed", {}), "title", "") or url
+        entries = getattr(feed, "entries", []) or []
+
+    # Fallback: si es arXiv y no hay entries, intenta export API
+    if (not entries) and ("arxiv.org" in url):
+        fb = arxiv_api_from_rss_url(url)
+        if fb:
+            fb_feed, fb_err = parse_with_retries(fb)
+            if fb_feed:
+                fb_title = getattr(getattr(fb_feed, "feed", {}), "title", "") or src_title
+                src_title = f"{src_title} (fallback API)"
+                entries = getattr(fb_feed, "entries", []) or []
+                used_fallback = True
+                err = ""  # se rescató vía fallback
+            else:
+                err = err or fb_err
+
+    stats[url] = {
+        "source_title": src_title,
+        "count": len(entries[:per_feed_limit]),
+        "used_fallback": used_fallback,
+        "error": err
+    }
 
     for e in entries[:per_feed_limit]:
         title = norm(getattr(e, "title", ""))
@@ -104,11 +160,10 @@ for url in SOURCES:
         cat, pr = classify(base_text)
 
         # HARD CLAMP arXiv: SIEMPRE Investigación/MEDIA
-        arxiv_hit = is_arxiv(link, src, base_text)
+        arxiv_hit = is_arxiv(link, src_title, base_text)
         if arxiv_hit:
             cat, pr = "Investigación", "MEDIA"
         else:
-            # Reaplica prioridad solo para no-arXiv
             if re.search(ALTA_STRONG_RX, base_text, flags=re.IGNORECASE):
                 pr = "ALTA"
             elif re.search(r"\b(update\w*|beta|preview|roll[- ]?out|api|sdk|agent|research|paper|benchmark)\b", base_text, flags=re.IGNORECASE):
@@ -117,7 +172,7 @@ for url in SOURCES:
                 pr = "BAJA"
 
         items.append({
-            "source": norm(src),
+            "source": norm(src_title),
             "title": title,
             "link": link,
             "summary": summ,
@@ -152,17 +207,19 @@ payload = {
   "meta": {
     "script_version": SCRIPT_VERSION,
     "arxiv_limit": ARXIV_LIMIT,
-    "hard_clamp_arxiv": True
+    "hard_clamp_arxiv": True,
+    "http_agent": HTTP_AGENT,
+    "sources_stats": stats
   },
   "items": clean[:50]
 }
 
 # --------- Salida ----------
 with open("updates.json","w",encoding="utf-8") as f:
-    json.dump(payload, f, ensure_ascii=False, indent=2)
+  json.dump(payload, f, ensure_ascii=False, indent=2)
 
 with open("updates.md","w",encoding="utf-8") as f:
-    f.write(f"# INTEL Diario – {payload['generated_at']}\n\n")
-    f.write(f"_Script: {SCRIPT_VERSION} · arXiv_limit={ARXIV_LIMIT} · hard_clamp_arxiv=True_\n\n")
-    for it in payload["items"]:
-        f.write(f"- **[{it['category']}/{it['priority']}] {it['title']}** — {it['source']} | {it['link']}\n")
+  f.write(f"# INTEL Diario – {payload['generated_at']}\n\n")
+  f.write(f"_Script: {SCRIPT_VERSION} · arXiv_limit={ARXIV_LIMIT} · hard_clamp_arxiv=True_\n\n")
+  for it in payload["items"]:
+    f.write(f"- **[{it['category']}/{it['priority']}] {it['title']}** — {it['source']} | {it['link']}\n")
