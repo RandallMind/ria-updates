@@ -57,7 +57,7 @@ PY
 
       - name: Run collector
         run: |
-          python update_sweep.py
+          python run_ci.py
 
       - name: Upload updates.json
         if: success()
@@ -65,3 +65,4 @@ PY
         with:
           name: updates-json
           path: updates.json
+
