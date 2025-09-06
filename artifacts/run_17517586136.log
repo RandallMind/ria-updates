@@ -1,0 +1,7 @@
+﻿gh : failed to get run log: log not found
+En línea: 1 Carácter: 9
++ $logs = gh run view $id --log 2>&1
++         ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (failed to get run log: log not found:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 

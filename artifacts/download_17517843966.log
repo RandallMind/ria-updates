@@ -1,0 +1,7 @@
+﻿gh : no valid artifacts found to download
+En línea: 1 Carácter: 7
++ $dl = gh run download $id --name updates-json --dir .\artifacts 2>&1
++       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (no valid artifacts found to download:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 

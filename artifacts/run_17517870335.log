@@ -1,0 +1,7 @@
+﻿gh : failed to get run log: log not found
+En línea: 2 Carácter: 5
++     gh run view $id --log 2>&1 | Out-File -FilePath (".\artifacts\run ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (failed to get run log: log not found:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 

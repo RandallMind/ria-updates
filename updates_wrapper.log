@@ -1,0 +1,11 @@
+STDOUT:\n2025-09-06 12:42:05,869 INFO Wrote updates.json (items: 1261)
+2025-09-06 12:42:05,872 INFO Wrote updates.md
+2025-09-06 12:42:05,872 INFO Summary:
+2025-09-06 12:42:05,873 INFO   total items: 1261
+2025-09-06 12:42:05,873 INFO   top5: 5
+2025-09-06 12:42:05,873 INFO   https://openai.com/blog/rss.xml -> count=638 error=False
+2025-09-06 12:42:05,873 INFO   https://huggingface.co/blog/feed.xml -> count=623 error=False
+2025-09-06 12:42:05,873 INFO   https://arxiv.org/rss/cs.AI -> count=0 error=False
+2025-09-06 12:42:05,873 INFO   https://arxiv.org/rss/cs.LG -> count=0 error=False
+2025-09-06 12:42:05,873 INFO   https://arxiv.org/rss/cs.CL -> count=0 error=False
+\n\nSTDERR:\n
