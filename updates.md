@@ -1,14 +1,7 @@
-# INTEL Diario – 2025-09-05T23:51:36.991648+00:00
+# INTEL Diario – 2025-09-06T04:00:46.775345+00:00
 
-- **[Investigación/ALTA] CEHR-GPT: A Scalable Multi-Task Foundation Model for Electronic Health Records** — cs.LG updates on arXiv.org | https://arxiv.org/abs/2509.03643
-- **[Investigación/ALTA] Diffusion-RL Based Air Traffic Conflict Detection and Resolution Method** — cs.AI updates on arXiv.org | https://arxiv.org/abs/2509.03550
-- **[Investigación/ALTA] Enhancing Speech Large Language Models through Reinforced Behavior Alignment** — cs.CL updates on arXiv.org | https://arxiv.org/abs/2509.03526
-- **[Investigación/ALTA] Multilevel Analysis of Cryptocurrency News using RAG Approach with Fine-Tuned Mistral Large Language Model** — cs.CL updates on arXiv.org | https://arxiv.org/abs/2509.03527
-- **[Investigación/ALTA] Multilinear and Linear Programs for Partially Identifiable Queries in Quasi-Markovian Structural Causal Models** — cs.AI updates on arXiv.org | https://arxiv.org/abs/2509.03548
-- **[Investigación/ALTA] Nonnegative matrix factorization and the principle of the common cause** — cs.LG updates on arXiv.org | https://arxiv.org/abs/2509.03652
-- **[Investigación/ALTA] PG-Agent: An Agent Powered by Page Graph** — cs.AI updates on arXiv.org | https://arxiv.org/abs/2509.03536
-- **[Investigación/ALTA] Speech-Based Cognitive Screening: A Systematic Evaluation of LLM Adaptation Strategies** — cs.CL updates on arXiv.org | https://arxiv.org/abs/2509.03525
-- **[Investigación/ALTA] The Optimiser Hidden in Plain Sight: Training with the Loss Landscape's Induced Metric** — cs.LG updates on arXiv.org | https://arxiv.org/abs/2509.03594
+_Script: 2025-09-05-hard-clamp-v4 · arXiv_limit=2 · hard_clamp_arxiv=True_
+
 - **[Productos/ALTA] Expanding economic opportunity with AI** — OpenAI News | https://openai.com/index/expanding-economic-opportunity-with-ai
 - **[Productos/ALTA] OpenAI and Greek Government launch ‘OpenAI for Greece’** — OpenAI News | https://openai.com/global-affairs/openai-for-greece
 - **[Investigación/MEDIA] MCP for Research: How to Connect AI to Research Tools** — Hugging Face - Blog | https://huggingface.co/blog/mcp-for-research
