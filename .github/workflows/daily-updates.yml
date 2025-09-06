@@ -60,9 +60,10 @@ PY
           python run_ci.py
 
       - name: Upload updates.json
-        if: success()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: updates-json
           path: updates.json
+
 
