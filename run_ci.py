@@ -1,11 +1,11 @@
 ﻿#!/usr/bin/env python3
 import subprocess, json, traceback, sys, os
 logfile = "updates_wrapper.log"
-def write_json_error(msg, tb=None):
+def write_json_error(err_text, tb_text=None):
     try:
-        err = {"error": True, "message": str(msg)}
-        if tb:
-            err["traceback"] = tb
+        err = {"error": True, "message": str(err_text)}
+        if tb_text:
+            err["traceback"] = tb_text
         with open("updates.json", "w", encoding="utf-8") as f:
             json.dump(err, f, ensure_ascii=False, indent=2)
     except Exception:
@@ -19,7 +19,7 @@ try:
         f.write("\\n\\nSTDERR:\\n")
         f.write(p.stderr or "")
     if p.returncode != 0:
-        write_json_error(p.stderr or p.stdout or "Non-zero exit", p.stderr or "")
+        write_json_error(p.stderr or p.stdout or "Non-zero exit", p.stderr or p.stdout)
         sys.exit(p.returncode)
     if not os.path.exists("updates.json"):
         with open("updates.json", "w", encoding="utf-8") as f:
